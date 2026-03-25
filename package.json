@@ -1,0 +1,10 @@
+{
+  "name": "acadcode",
+  "version": "2.0.0",
+  "description": "AcadCode — quiz platform (Vercel + Vercel Postgres)",
+  "type": "module",
+  "dependencies": {
+    "@vercel/postgres": "^0.10.0",
+    "bcryptjs": "^2.4.3"
+  }
+}
