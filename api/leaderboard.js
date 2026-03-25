@@ -10,28 +10,49 @@ export default async function handler(req, res) {
   const limit  = Math.min(parseInt(req.query?.limit  ?? '20', 10), 100);
   const period = req.query?.period ?? 'all';
 
-  // Date filter is a safe string literal (not user input)
-  const dateFilter = period === 'today'
-    ? sql` AND sc.submitted_at::date = CURRENT_DATE`
+  const rows = period === 'today'
+    ? await sql`
+        SELECT
+            u.id,
+            u.username,
+            MAX(sc.score)        AS best_score,
+            COUNT(sc.id)         AS games_played,
+            u.streak,
+            MAX(sc.submitted_at) AS last_played
+        FROM   scores sc
+        JOIN   users  u ON u.id = sc.user_id
+        WHERE  sc.submitted_at::date = CURRENT_DATE
+        GROUP  BY u.id, u.username, u.streak
+        ORDER  BY best_score DESC, u.streak DESC, games_played DESC
+        LIMIT  ${limit}`
     : period === 'week'
-    ? sql` AND sc.submitted_at >= NOW() - INTERVAL '7 days'`
-    : sql``;
-
-  const rows = await sql`
-    SELECT
-        u.id,
-        u.username,
-        MAX(sc.score)        AS best_score,
-        COUNT(sc.id)         AS games_played,
-        u.streak,
-        MAX(sc.submitted_at) AS last_played
-    FROM   scores sc
-    JOIN   users  u ON u.id = sc.user_id
-    WHERE  1=1 ${dateFilter}
-    GROUP  BY u.id, u.username, u.streak
-    ORDER  BY best_score DESC, u.streak DESC, games_played DESC
-    LIMIT  ${limit}
-  `;
+    ? await sql`
+        SELECT
+            u.id,
+            u.username,
+            MAX(sc.score)        AS best_score,
+            COUNT(sc.id)         AS games_played,
+            u.streak,
+            MAX(sc.submitted_at) AS last_played
+        FROM   scores sc
+        JOIN   users  u ON u.id = sc.user_id
+        WHERE  sc.submitted_at >= NOW() - INTERVAL '7 days'
+        GROUP  BY u.id, u.username, u.streak
+        ORDER  BY best_score DESC, u.streak DESC, games_played DESC
+        LIMIT  ${limit}`
+    : await sql`
+        SELECT
+            u.id,
+            u.username,
+            MAX(sc.score)        AS best_score,
+            COUNT(sc.id)         AS games_played,
+            u.streak,
+            MAX(sc.submitted_at) AS last_played
+        FROM   scores sc
+        JOIN   users  u ON u.id = sc.user_id
+        GROUP  BY u.id, u.username, u.streak
+        ORDER  BY best_score DESC, u.streak DESC, games_played DESC
+        LIMIT  ${limit}`;
 
   const leaderboard = rows.map((row, i) => ({
     rank:        i + 1,
