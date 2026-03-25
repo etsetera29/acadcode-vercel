@@ -10,9 +10,16 @@ export default async function handler(req, res) {
   const limit  = Math.min(parseInt(req.query?.limit  ?? '20', 10), 100);
   const period = req.query?.period ?? 'all';
 
-  // neon() tagged templates don't support nested sql fragment interpolation.
-  // Use sql.query(string, params) with a plain parameterised string instead.
-  const base = `
+  // neon() is a tagged template function. Calling sql(stringsArray, ...values)
+  // is identical to the sql`...` syntax, letting us build queries dynamically
+  // without unsupported fragment interpolation.
+
+  const tail = `
+    GROUP  BY u.id, u.username, u.streak
+    ORDER  BY best_score DESC, u.streak DESC, games_played DESC
+    LIMIT  `;  // $1 will be appended as the interpolated value
+
+  const selectFrom = `
     SELECT
         u.id,
         u.username,
@@ -22,30 +29,27 @@ export default async function handler(req, res) {
         MAX(sc.submitted_at) AS last_played
     FROM   scores sc
     JOIN   users  u ON u.id = sc.user_id
-  `;
+    `;
 
-  let queryText;
+  let rows;
 
   if (period === 'today') {
-    queryText = base + `
-    WHERE  sc.submitted_at::date = CURRENT_DATE
-    GROUP  BY u.id, u.username, u.streak
-    ORDER  BY best_score DESC, u.streak DESC, games_played DESC
-    LIMIT  $1`;
+    // sql`${selectFrom}WHERE sc.submitted_at::date = CURRENT_DATE${tail}${limit}`
+    rows = await sql(
+      [selectFrom + `WHERE  sc.submitted_at::date = CURRENT_DATE` + tail, ``],
+      limit
+    );
   } else if (period === 'week') {
-    queryText = base + `
-    WHERE  sc.submitted_at >= NOW() - INTERVAL '7 days'
-    GROUP  BY u.id, u.username, u.streak
-    ORDER  BY best_score DESC, u.streak DESC, games_played DESC
-    LIMIT  $1`;
+    rows = await sql(
+      [selectFrom + `WHERE  sc.submitted_at >= NOW() - INTERVAL '7 days'` + tail, ``],
+      limit
+    );
   } else {
-    queryText = base + `
-    GROUP  BY u.id, u.username, u.streak
-    ORDER  BY best_score DESC, u.streak DESC, games_played DESC
-    LIMIT  $1`;
+    rows = await sql(
+      [selectFrom + tail, ``],
+      limit
+    );
   }
-
-  const rows = await sql.query(queryText, [limit]);
 
   const leaderboard = rows.map((row, i) => ({
     rank:        i + 1,
