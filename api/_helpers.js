@@ -1,14 +1,18 @@
 // ─────────────────────────────────────────────────────────────────
 //  AcadCode — Shared API Helpers
-//  Uses @vercel/postgres — reads POSTGRES_URL automatically.
+//  Uses @neondatabase/serverless. Set DATABASE_URL in Vercel env vars.
 //  Files prefixed _ are not treated as Vercel functions.
 // ─────────────────────────────────────────────────────────────────
 
-import { db }  from '@vercel/postgres';
-import bcrypt  from 'bcryptjs';
-import crypto  from 'crypto';
+import { neon } from '@neondatabase/serverless';
+import bcrypt    from 'bcryptjs';
+import crypto    from 'crypto';
 
-export { db, bcrypt, crypto };
+
+export { bcrypt, crypto };
+
+// One SQL client per warm instance — reads DATABASE_URL automatically
+export const sql = neon(process.env.DATABASE_URL);
 
 // ─── Token TTL ────────────────────────────────────────────────────
 export const TOKEN_TTL_SECONDS = 60 * 60 * 24 * 7;   // 7 days
@@ -63,13 +67,12 @@ export async function requireAuth(req, res) {
   }
   const token = m[1];
 
-  const { rows } = await db.query(
-    `SELECT s.user_id, s.expires_at, u.username, u.email
-     FROM   sessions s
-     JOIN   users    u ON u.id = s.user_id
-     WHERE  s.token = $1`,
-    [token]
-  );
+  const rows = await sql`
+    SELECT s.user_id, s.expires_at, u.username, u.email
+    FROM   sessions s
+    JOIN   users    u ON u.id = s.user_id
+    WHERE  s.token = ${token}
+  `;
   const row = rows[0];
 
   if (!row) {
@@ -77,7 +80,7 @@ export async function requireAuth(req, res) {
     return null;
   }
   if (new Date(row.expires_at) < new Date()) {
-    await db.query('DELETE FROM sessions WHERE token = $1', [token]);
+    await sql`DELETE FROM sessions WHERE token = ${token}`;
     err(res, 'Session expired. Please log in again.', 401);
     return null;
   }
@@ -86,14 +89,13 @@ export async function requireAuth(req, res) {
 
 // ─── Streak calculator ────────────────────────────────────────────
 export async function recalcStreak(userId) {
-  const { rows } = await db.query(
-    `SELECT submitted_at::date AS day
-     FROM   scores
-     WHERE  user_id = $1
-     GROUP  BY day
-     ORDER  BY day DESC`,
-    [userId]
-  );
+  const rows = await sql`
+    SELECT submitted_at::date AS day
+    FROM   scores
+    WHERE  user_id = ${userId}
+    GROUP  BY day
+    ORDER  BY day DESC
+  `;
 
   let streak   = 0;
   const today  = new Date();
@@ -111,6 +113,6 @@ export async function recalcStreak(userId) {
     }
   }
 
-  await db.query('UPDATE users SET streak = $1 WHERE id = $2', [streak, userId]);
+  await sql`UPDATE users SET streak = ${streak} WHERE id = ${userId}`;
   return streak;
 }
