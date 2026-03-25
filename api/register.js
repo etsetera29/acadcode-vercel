@@ -3,7 +3,7 @@
 // Returns: { "message": "…", "user": {…} }
 
 import { handleOptions, requireMethod, getBody, ok, err,
-         db, bcrypt } from './_helpers.js';
+         sql, bcrypt } from './_helpers.js';
 
 export default async function handler(req, res) {
   if (handleOptions(req, res)) return;
@@ -18,21 +18,20 @@ export default async function handler(req, res) {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return err(res, 'Invalid email address.');
   if (password.length < 6) return err(res, 'Password must be at least 6 characters.');
 
-  const { rows: existing } = await db.query(
-    'SELECT id FROM users WHERE username = $1 OR email = $2',
-    [uname, email]
-  );
+  const existing = await sql`
+    SELECT id FROM users WHERE username = ${uname} OR email = ${email}
+  `;
   if (existing.length) return err(res, 'Username or email already in use.', 409);
 
   const hash = await bcrypt.hash(password, 10);
-  const { rows } = await db.query(
-    `INSERT INTO users (username, email, password_hash, created_at)
-     VALUES ($1, $2, $3, NOW()) RETURNING id`,
-    [uname, email, hash]
-  );
+  const result = await sql`
+    INSERT INTO users (username, email, password_hash, created_at)
+    VALUES (${uname}, ${email}, ${hash}, NOW())
+    RETURNING id
+  `;
 
   ok(res, {
     message: 'Account created successfully.',
-    user: { id: rows[0].id, username: uname, email },
+    user: { id: result[0].id, username: uname, email },
   }, 201);
 }
