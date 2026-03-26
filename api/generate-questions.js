@@ -1,10 +1,10 @@
 // POST /api/generate-questions
 // Called by Vercel Cron at midnight PHT (16:00 UTC) every day.
 // Protected by CRON_SECRET env var.
-// Uses Google Gemini API (free tier — no credit card required).
-// Get your free key at: https://ai.google.dev
+// Uses Groq API (free tier — no credit card required).
+// Get your free key at: https://console.groq.com
 
-import { handleOptions, requireMethod, ok, err, sql } from './_helpers.js';
+import { handleOptions, ok, err, sql } from './_helpers.js';
 
 // ── Subject rotation (day-of-week in PHT) ────────────────────────
 const SUBJECTS = {
@@ -17,7 +17,6 @@ const SUBJECTS = {
   6: 'Arts & Culture',
 };
 
-// ── Prompt builder ───────────────────────────────────────────────
 function buildPrompt(subject, dateStr) {
   return `You are an academic quiz generator. Generate exactly 10 multiple-choice questions about "${subject}" for ${dateStr}.
 
@@ -40,9 +39,7 @@ Respond with ONLY a valid JSON array — no markdown fences, no preamble, no ext
 }`;
 }
 
-// ── Main handler ─────────────────────────────────────────────────
 export default async function handler(req, res) {
-  if (handleOptions(req, res)) return;
   if (req.method !== 'GET' && req.method !== 'POST') return err(res, 'Method not allowed.', 405);
 
   // Verify CRON_SECRET
@@ -73,35 +70,36 @@ export default async function handler(req, res) {
     return ok(res, { message: 'Questions already generated for today.', date: dateStr, subject });
   }
 
-  // Call Google Gemini API (free tier)
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return err(res, 'GEMINI_API_KEY not configured.', 500);
+  // Call Groq API (free, no credit card, OpenAI-compatible)
+  const apiKey = process.env.GROQ_API_KEY;
+  if (!apiKey) return err(res, 'GROQ_API_KEY not configured.', 500);
 
   let questions;
   try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: buildPrompt(subject, dateStr) }] }],
-          generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 4096,
-          },
-        }),
-      }
-    );
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model:       'llama-3.3-70b-versatile',
+        max_tokens:  4096,
+        temperature: 0.7,
+        messages: [
+          { role: 'user', content: buildPrompt(subject, dateStr) }
+        ],
+      }),
+    });
 
     if (!response.ok) {
       const body = await response.text();
-      console.error('Gemini API error:', response.status, body);
-      return err(res, `Gemini error ${response.status}: ${body}`, 502);
+      console.error('Groq API error:', response.status, body);
+      return err(res, `Groq error ${response.status}: ${body}`, 502);
     }
 
     const data = await response.json();
-    const raw  = data.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
+    const raw  = data.choices?.[0]?.message?.content ?? '';
 
     // Strip accidental markdown fences just in case
     const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();
