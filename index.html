@@ -266,7 +266,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:28p
       <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
         <button class="btn btn-ghost btn-sm" onclick="showScreen('leaderboard')">📊 Leaderboard</button>
         <button class="btn btn-ghost btn-sm" onclick="showResTab('review')">📋 Review</button>
-        <button class="btn btn-primary btn-sm" onclick="startQuiz()">↺ Retry</button>
+        <button class="btn btn-primary btn-sm" onclick="showScreen('home')">🏠 Home</button>
       </div>
     </div>
     <div class="tabs">
@@ -830,7 +830,17 @@ async function checkDailyStatus() {
     QUESTIONS = qdata.questions;
   } catch(e) {
     const badge = document.getElementById('subjectBadge');
-    if (badge) { badge.textContent = '📚 Questions loading…'; badge.style.display = 'inline-block'; }
+    if (badge) {
+      badge.textContent = "⚠️ Today's questions aren't ready yet — check back soon!";
+      badge.style.display = 'inline-block';
+      badge.style.background = '#e67e22';
+    }
+    // Disable start button until questions are available
+    const startBtn = document.querySelector('[onclick="startQuiz()"]');
+    if (startBtn) {
+      startBtn.disabled = true;
+      startBtn.textContent = "Questions loading…";
+    }
   }
 
   if (!session) return; // guest — no daily gate
@@ -848,7 +858,7 @@ function lockStartButton(nextResetMs, score, total) {
   clearInterval(dailyCountdownInterval);
 
   const startBtn  = document.querySelector('#screen-home .btn-primary');
-  const retryBtn  = document.querySelector('#screen-results .btn-primary.btn-sm');
+  // retryBtn removed — replaced with Home button
 
   function applyLock(btn) {
     if (!btn) return;
@@ -856,7 +866,7 @@ function lockStartButton(nextResetMs, score, total) {
     btn.onclick = null;
   }
   applyLock(startBtn);
-  applyLock(retryBtn);
+  // applyLock(retryBtn); — no longer needed
 
   // Insert or update the "played today" notice
   let notice = document.getElementById('played-today-notice');
