@@ -43,7 +43,7 @@ Respond with ONLY a valid JSON array — no markdown fences, no preamble, no ext
 // ── Main handler ─────────────────────────────────────────────────
 export default async function handler(req, res) {
   if (handleOptions(req, res)) return;
-  if (!requireMethod(req, res, 'POST')) return;
+  if (req.method !== 'GET' && req.method !== 'POST') return err(res, 'Method not allowed.', 405);
 
   // Verify CRON_SECRET
   const cronSecret = process.env.CRON_SECRET;
