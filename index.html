@@ -124,7 +124,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
 /* ── LEADERBOARD ── */
 .lb-controls{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
 .lb-table{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:20px}
-.lb-header,.lb-row{display:grid;grid-template-columns:44px 32px 1fr 70px 70px 70px;padding:11px 14px;align-items:center;font-size:.83rem;gap:4px}
+.lb-header,.lb-row{display:grid;grid-template-columns:44px 1fr 140px 70px 70px 70px;padding:11px 14px;align-items:center;font-size:.83rem;gap:4px}
 .lb-header{background:var(--surface2);color:var(--muted);font-size:.7rem;text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--border)}
 .lb-row{border-bottom:1px solid rgba(178,236,240,.5);transition:background .15s}
 .lb-row:last-child{border-bottom:none}
@@ -186,6 +186,32 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
 .ri-ans{font-size:.84rem;color:var(--muted)}
 .ri-ans span{color:var(--text)}
 
+/* ── YEAR LEVEL BADGE ── */
+.yl-badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:.68rem;font-weight:600;background:var(--aqua-light);color:var(--aqua-dark);border:1px solid var(--aqua);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;vertical-align:middle}
+.lb-yl{font-size:.72rem;color:var(--muted);text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ── INSIGHTS ── */
+.insights-section{margin-top:28px}
+.insight-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 16px;margin-bottom:12px}
+.insight-subject{font-family:'DM Serif Display',serif;font-size:1.1rem;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.insight-subject span{font-family:'DM Mono',monospace;font-size:.8rem;color:var(--aqua-dark);background:var(--aqua-light);padding:2px 8px;border-radius:6px}
+.insight-bar-wrap{margin-bottom:6px}
+.insight-bar-label{display:flex;justify-content:space-between;font-size:.75rem;margin-bottom:3px;color:var(--muted)}
+.insight-bar-label strong{color:var(--text)}
+.insight-bar-track{height:6px;background:var(--surface2);border-radius:3px;overflow:hidden}
+.insight-bar-fill{height:100%;background:linear-gradient(90deg,var(--aqua),var(--accent));border-radius:3px;transition:width .6s ease}
+.insight-top-badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(26,198,204,.15),rgba(10,156,161,.1));border:1px solid var(--aqua);border-radius:8px;padding:6px 12px;font-size:.8rem;margin-bottom:10px;font-weight:600;color:var(--aqua-dark)}
+
+/* ── SELECT FIELDS ── */
+.field select{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:13px 16px;color:var(--text);font-family:'Instrument Sans',sans-serif;font-size:1rem;outline:none;transition:border-color .2s;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235a8a8d' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+.field select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(26,198,204,.12)}
+
+/* ── LB FILTER ── */
+.lb-yl-filter{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
+.lb-yl-filter label{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);white-space:nowrap}
+.lb-yl-filter select{background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:6px 28px 6px 10px;color:var(--text);font-family:'Instrument Sans',sans-serif;font-size:.82rem;outline:none;transition:border-color .2s;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%235a8a8d' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+.lb-yl-filter select:focus{border-color:var(--accent)}
+
 /* ── MISC ── */
 .section-title{font-family:'DM Serif Display',serif;font-size:1.6rem;margin-bottom:18px}
 .page-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:12px;flex-wrap:wrap}
@@ -210,7 +236,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
   .q-text{font-size:1.3rem}
   .results-stats{display:flex;max-width:none;gap:20px;justify-content:center}
   .r-stat{border:none;padding:0;background:transparent}
-  .lb-header,.lb-row{grid-template-columns:50px 36px 1fr 80px 80px 80px;padding:12px 18px}
+  .lb-header,.lb-row{grid-template-columns:50px 1fr 160px 80px 80px 80px;padding:12px 18px}
   .flag-grid{grid-template-columns:repeat(6,1fr)}
   .stats-row{gap:16px}
 }
@@ -221,8 +247,9 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
   .home-actions .btn{padding:12px 18px;font-size:.9rem;flex:1;min-width:0}
   .quiz-nav{gap:8px}
   .quiz-nav .btn{flex:1}
-  .lb-header,.lb-row{grid-template-columns:36px 28px 1fr 56px 56px;padding:10px 12px;font-size:.78rem}
+  .lb-header,.lb-row{grid-template-columns:36px 1fr 80px 56px 56px !important;padding:10px 12px;font-size:.78rem}
   .lb-games{display:none}
+  .lb-yl .yl-badge{max-width:70px;font-size:.62rem;padding:2px 5px}
   .results-actions .btn{flex:1;min-width:0;font-size:.85rem;padding:11px 14px}
   .lb-controls{gap:6px}
   .lb-controls .btn-xs{padding:7px 12px;font-size:.76rem}
@@ -315,12 +342,31 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
       <div class="section-title">🏆 Rankings</div>
       <button class="btn btn-ghost btn-sm" onclick="showScreen('home')">← Home</button>
     </div>
-    <div class="lb-controls">
-      <button class="btn btn-ghost btn-xs active" id="lbp-all"   onclick="loadLeaderboard('all')">All Time</button>
-      <button class="btn btn-ghost btn-xs"        id="lbp-week"  onclick="loadLeaderboard('week')">This Week</button>
-      <button class="btn btn-ghost btn-xs"        id="lbp-today" onclick="loadLeaderboard('today')">Today</button>
+    <div class="tabs" style="margin-bottom:18px">
+      <button class="tab-btn active" id="lbtab-rankings" onclick="switchLbTab('rankings')">Rankings</button>
+      <button class="tab-btn"        id="lbtab-insights" onclick="switchLbTab('insights')">📊 Year Level Insights</button>
     </div>
-    <div id="lb-main"></div>
+    <div id="lb-tab-rankings">
+      <div class="lb-controls">
+        <button class="btn btn-ghost btn-xs active" id="lbp-all"   onclick="loadLeaderboard('all')">All Time</button>
+        <button class="btn btn-ghost btn-xs"        id="lbp-week"  onclick="loadLeaderboard('week')">This Week</button>
+        <button class="btn btn-ghost btn-xs"        id="lbp-today" onclick="loadLeaderboard('today')">Today</button>
+      </div>
+      <div class="lb-yl-filter">
+        <label>Filter by:</label>
+        <select id="lb-yl-select" onchange="loadLeaderboard(currentLbPeriod)">
+          <option value="">All Year Levels</option>
+          <option value="elementary">Elementary</option>
+          <option value="junior_high">Junior High</option>
+          <option value="senior_high">Senior High</option>
+          <option value="college">College</option>
+        </select>
+      </div>
+      <div id="lb-main"></div>
+    </div>
+    <div id="lb-tab-insights" style="display:none">
+      <div id="lb-insights-content"></div>
+    </div>
   </div>
 
   <!-- PROFILE -->
@@ -353,8 +399,24 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
       <div class="field"><label>Username</label><input id="reg-user" type="text" placeholder="e.g. alex" maxlength="24"/></div>
       <div class="field"><label>Email</label><input id="reg-email" type="email" placeholder="alex@email.com"/></div>
       <div class="field"><label>Password</label><input id="reg-pass" type="password" placeholder="min 6 characters"/></div>
+      <div class="field">
+        <label>Year Level</label>
+        <select id="reg-year-level" onchange="onYearLevelChange()">
+          <option value="">— Select Year Level —</option>
+          <option value="elementary">Elementary</option>
+          <option value="junior_high">Junior High School</option>
+          <option value="senior_high">Senior High School</option>
+          <option value="college">College</option>
+        </select>
+      </div>
+      <div class="field" id="reg-track-wrap" style="display:none">
+        <label id="reg-track-label">Track / Course</label>
+        <select id="reg-track-course">
+          <option value="">— Select —</option>
+        </select>
+      </div>
       <div class="flag-picker-wrap">
-        <label>Your Flag <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(permanent &mdash; shown on leaderboard &amp; profile)</span></label>
+        <label>Your Flag <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(shown on leaderboard &amp; profile)</span></label>
         <div class="flag-selected-preview" id="reg-flag-preview">
           <span class="fp-em" id="reg-flag-em">🏳️</span>
           <span id="reg-flag-name" style="color:var(--text)">Select a flag below</span>
@@ -416,7 +478,15 @@ function handleOverlayClick(e) { if (e.target === document.getElementById('authM
 function switchModal(tab) {
   document.getElementById('modal-login').style.display    = tab === 'login'    ? '' : 'none';
   document.getElementById('modal-register').style.display = tab === 'register' ? '' : 'none';
-  if (tab === 'register') { selectedFlag = null; buildFlagGrid(); }
+  if (tab === 'register') {
+    selectedFlag = null;
+    buildFlagGrid();
+    // reset year level
+    const ylSel = document.getElementById('reg-year-level');
+    if (ylSel) { ylSel.value = ''; }
+    const wrap = document.getElementById('reg-track-wrap');
+    if (wrap) wrap.style.display = 'none';
+  }
 }
 
 async function doLogin() {
@@ -441,17 +511,27 @@ async function doLogin() {
 }
 
 async function doRegister() {
-  const user  = document.getElementById('reg-user').value.trim();
-  const email = document.getElementById('reg-email').value.trim();
-  const pass  = document.getElementById('reg-pass').value;
-  const errEl = document.getElementById('reg-err');
-  const btn   = document.getElementById('reg-btn');
+  const user        = document.getElementById('reg-user').value.trim();
+  const email       = document.getElementById('reg-email').value.trim();
+  const pass        = document.getElementById('reg-pass').value;
+  const year_level  = document.getElementById('reg-year-level').value;
+  const track_course = document.getElementById('reg-track-course')?.value || '';
+  const errEl       = document.getElementById('reg-err');
+  const btn         = document.getElementById('reg-btn');
   errEl.textContent = '';
   if (!user || !email || !pass) { errEl.textContent = 'Please fill in all fields.'; return; }
+  if (!year_level) { errEl.textContent = 'Please select your year level.'; return; }
+  if ((year_level === 'senior_high' || year_level === 'college') && !track_course) {
+    errEl.textContent = 'Please select your track / course.'; return;
+  }
   if (!selectedFlag) { errEl.textContent = 'Please select a flag for your profile.'; return; }
   btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Creating…';
   try {
-    await api('POST', 'register', {username: user, email, password: pass, flag: selectedFlag}, false);
+    await api('POST', 'register', {
+      username: user, email, password: pass, flag: selectedFlag,
+      year_level,
+      track_course: (year_level === 'senior_high' || year_level === 'college') ? track_course : null,
+    }, false);
     // Auto-login after register
     const data = await api('POST', 'login', {username: user, password: pass}, false);
     session = {token: data.token, user: data.user};
@@ -661,40 +741,122 @@ function renderReview() {
   }).join('');
 }
 
-// ── LEADERBOARD ───────────────────────────────────────────────────────────────
+// ── LEADERBOARD ───────────────────────────────────────────────────
+let currentLbPeriod = 'all';
+
 async function loadLeaderboard(period = 'all', containerId = 'lb-main') {
+  currentLbPeriod = period;
   // Highlight active period btn (only on main leaderboard screen)
   ['all','week','today'].forEach(p => {
     const b = document.getElementById('lbp-' + p);
     if (b) b.style.borderColor = p === period ? 'var(--accent)' : '';
   });
+  const yl = document.getElementById('lb-yl-select')?.value ?? '';
   const container = document.getElementById(containerId);
   if (!container) return;
   container.innerHTML = '<div class="lb-table"><div class="lb-empty"><span class="spinner"></span> Loading…</div></div>';
   try {
-    const data = await api('GET', `leaderboard?period=${period}&limit=20`, null, false);
+    const qs = `period=${period}&limit=20${yl ? '&year_level=' + encodeURIComponent(yl) : ''}`;
+    const data = await api('GET', `leaderboard?${qs}`, null, false);
     renderLbTable(data.leaderboard, container);
   } catch(e) {
     container.innerHTML = `<div class="lb-table"><div class="lb-empty">⚠ Could not load leaderboard.<br><small>${e.message}</small></div></div>`;
   }
 }
 
+function ylLabel(year_level, track_course) {
+  if (year_level === 'elementary') return 'Elementary';
+  if (year_level === 'junior_high') return 'Junior High';
+  if (year_level === 'senior_high') return track_course ? track_course.replace('Senior High School ', '') : 'Senior High';
+  if (year_level === 'college') return track_course ? track_course.replace('College of ', 'Col. of ') : 'College';
+  return year_level || '';
+}
+
+function switchLbTab(tab) {
+  document.getElementById('lbtab-rankings').classList.toggle('active', tab === 'rankings');
+  document.getElementById('lbtab-insights').classList.toggle('active', tab === 'insights');
+  document.getElementById('lb-tab-rankings').style.display = tab === 'rankings' ? '' : 'none';
+  document.getElementById('lb-tab-insights').style.display = tab === 'insights' ? '' : 'none';
+  if (tab === 'insights') loadInsights();
+}
+
 function renderLbTable(rows, container) {
   const ranks = ['🥇','🥈','🥉'];
   const rCls  = ['gold','silver','bronze'];
   const myId  = session?.user?.id;
-  if (!rows.length) { container.innerHTML = '<div class="lb-table"><div class="lb-empty">No scores yet for this period.</div></div>'; return; }
-  container.innerHTML = `<div class="lb-table">
-    <div class="lb-header"><div>Rank</div><div></div><div>Player</div><div style="text-align:center">Best</div><div style="text-align:center">Streak</div><div class="lb-games" style="text-align:center">Games</div></div>
-    ${rows.map((r,i) => `<div class="lb-row">
-      <div class="lb-rank ${rCls[i]||''}">${ranks[i]||'#'+(i+1)}</div>
-      <div class="lb-flag">${r.flag||'🏳️'}</div>
-      <div class="lb-name ${r.id===myId?'lb-me':''}">${esc(r.display_name||r.username)}${r.id===myId?' (you)':''}</div>
-      <div class="lb-score">${r.best_score}/10</div>
-      <div class="lb-streak">🔥${r.streak}</div>
-      <div class="lb-games">${r.games}</div>
-    </div>`).join('')}
-  </div>`;
+  if (!rows.length) {
+    container.innerHTML = '<div class="lb-table"><div class="lb-empty">No scores yet for this period.</div></div>';
+    return;
+  }
+  const col = 'grid-template-columns:44px 1fr 140px 70px 70px 70px';
+  let html = '<div class="lb-table">';
+  html += '<div class="lb-header" style="' + col + '">';
+  html += '<div>Rank</div><div>Player</div><div>Level</div>';
+  html += '<div style="text-align:center">Best</div>';
+  html += '<div style="text-align:center">Streak</div>';
+  html += '<div class="lb-games" style="text-align:center">Games</div>';
+  html += '</div>';
+  rows.forEach(function(r, i) {
+    const yl     = ylLabel(r.year_level, r.track_course);
+    const fullYl = r.track_course || r.year_level || '';
+    const meClass = r.id === myId ? 'lb-me' : '';
+    const rankCls = rCls[i] || '';
+    const rankTxt = ranks[i] || ('#' + (i + 1));
+    html += '<div class="lb-row" style="' + col + '">';
+    html += '<div class="lb-rank ' + rankCls + '">' + rankTxt + '</div>';
+    html += '<div class="lb-name ' + meClass + '">' + esc(r.display_name || r.username) + (r.id === myId ? ' (you)' : '') + '</div>';
+    html += '<div class="lb-yl"><span class="yl-badge" title="' + esc(fullYl) + '">' + esc(yl) + '</span></div>';
+    html += '<div class="lb-score">' + r.best_score + '/10</div>';
+    html += '<div class="lb-streak">🔥' + r.streak + '</div>';
+    html += '<div class="lb-games">' + r.games + '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+// ── INSIGHTS ─────────────────────────────────────────────────────
+async function loadInsights() {
+  const el = document.getElementById('lb-insights-content');
+  if (!el) return;
+  el.innerHTML = '<div style="text-align:center;padding:40px"><span class="spinner"></span> Loading insights…</div>';
+  try {
+    const data = await api('GET', 'subject-insights', null, false);
+    renderInsights(data.insights, el);
+  } catch(e) {
+    el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:30px">\u26A0 ' + esc(e.message) + '</div>';
+  }
+}
+
+function renderInsights(insights, el) {
+  if (!insights || !insights.length) {
+    el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:40px 20px">No insights yet \u2014 scores are needed first.<br><small>Insights refresh every midnight PHT.</small></div>';
+    return;
+  }
+  const ylFullName = {
+    elementary: 'Elementary', junior_high: 'Junior High School',
+    senior_high: 'Senior High School', college: 'College',
+  };
+  const cards = insights.map(item => {
+    const top = item.top_group;
+    const topName = top ? (top.track_course || ylFullName[top.year_level] || top.year_level) : '\u2014';
+    const topScore = top ? top.avg_score.toFixed(1) : '0';
+    const bars = item.groups.slice(0, 6).map(g => {
+      const name = g.track_course || ylFullName[g.year_level] || g.year_level;
+      const pct  = Math.round((g.avg_score / 10) * 100);
+      return '<div class="insight-bar-wrap">' +
+        '<div class="insight-bar-label"><strong>' + esc(name) + '</strong>' +
+        '<span>' + g.avg_score.toFixed(1) + '/10 <span style="color:var(--border)">(' + g.player_count + ' player' + (g.player_count!==1?'s':'') + ')</span></span></div>' +
+        '<div class="insight-bar-track"><div class="insight-bar-fill" style="width:' + pct + '%"></div></div>' +
+        '</div>';
+    }).join('');
+    return '<div class="insight-card">' +
+      '<div class="insight-subject">' + esc(item.subject) + ' <span>Subject</span></div>' +
+      '<div class="insight-top-badge">\u{1F3C6} Best performers: ' + esc(topName) + ' \u2014 avg ' + topScore + '/10</div>' +
+      bars +
+      '</div>';
+  }).join('');
+  el.innerHTML = '<p style="color:var(--muted);font-size:.82rem;margin-bottom:18px">Based on leaderboard scores per subject. Updates every midnight PHT.</p>' + cards;
 }
 
 // ── PROFILE ───────────────────────────────────────────────────────────────────
@@ -707,17 +869,22 @@ async function loadProfile() {
     const u = data.user;
     el.innerHTML = `
       <div class="profile-card">
-        <div class="profile-avatar">${u.flag||'🏳️'}</div>
+        <div class="profile-avatar">${u.flag||'\u{1F3F3}\uFE0F'}</div>
         <div class="profile-display-name">${esc(u.display_name||u.username)}</div>
         <div class="profile-username">@${esc(u.username)}</div>
         <div class="profile-email">${esc(u.email)}</div>
+        <div style="margin-bottom:14px">
+          <span class="yl-badge" style="font-size:.82rem;padding:4px 12px" title="${esc(u.track_course||u.year_level||'')}">
+            ${esc(ylFullLabel(u.year_level, u.track_course))}
+          </span>
+        </div>
         <div class="name-edit-row">
           <input id="name-edit-input" type="text" value="${esc(u.display_name||u.username)}" maxlength="32" placeholder="Display name"/>
           <button class="btn btn-ghost btn-xs" onclick="saveDisplayName()">Save</button>
         </div>
         <div class="name-edit-status" id="name-edit-status"></div>
         <div class="stats-row">
-          <div class="stat-box"><span class="sb-val" style="color:var(--aqua-dark)">🔥${u.streak}</span><span class="sb-key">Streak</span></div>
+          <div class="stat-box"><span class="sb-val" style="color:var(--aqua-dark)">\u{1F525}${u.streak}</span><span class="sb-key">Streak</span></div>
           <div class="stat-box"><span class="sb-val" style="color:var(--aqua-dark)">${u.best}/10</span><span class="sb-key">Best Score</span></div>
           <div class="stat-box"><span class="sb-val">${u.games}</span><span class="sb-key">Games</span></div>
           <div class="stat-box"><span class="sb-val">${u.avg}</span><span class="sb-key">Avg Score</span></div>
@@ -740,6 +907,54 @@ async function loadProfile() {
 // ── UTILS ─────────────────────────────────────────────────────────────────────
 function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
+// ── YEAR LEVEL / TRACK-COURSE ────────────────────────────────────────────────
+const SENIOR_HIGH_TRACKS = [
+  'Senior High School (Technical-Vocational)',
+  'Senior High School (Information and Communication Technology)',
+  'Senior High School (Agriculture and Fishery Arts)',
+  'Senior High School (Arts and Design)',
+];
+const COLLEGE_COURSES = [
+  'College of Accountancy',
+  'College of Allied Medical Sciences',
+  'College of Business Management',
+  'College of Criminal Justice',
+  'College of Education',
+  'College of Computer Studies',
+  'College of Arts and Sciences',
+  'College of Engineering',
+];
+
+function onYearLevelChange() {
+  const yl    = document.getElementById('reg-year-level').value;
+  const wrap  = document.getElementById('reg-track-wrap');
+  const label = document.getElementById('reg-track-label');
+  const sel   = document.getElementById('reg-track-course');
+  if (yl === 'senior_high') {
+    wrap.style.display = '';
+    label.textContent  = 'SHS Track / Strand';
+    sel.innerHTML = '<option value="">\u2014 Select Track \u2014</option>' +
+      SENIOR_HIGH_TRACKS.map(t => '<option value="' + t + '">' + t.replace('Senior High School ','') + '</option>').join('');
+  } else if (yl === 'college') {
+    wrap.style.display = '';
+    label.textContent  = 'College / Course';
+    sel.innerHTML = '<option value="">\u2014 Select Course \u2014</option>' +
+      COLLEGE_COURSES.map(c => '<option value="' + c + '">' + c + '</option>').join('');
+  } else {
+    wrap.style.display = 'none';
+    sel.innerHTML = '<option value="">\u2014 Select \u2014</option>';
+  }
+}
+
+function ylFullLabel(year_level, track_course) {
+  const map = {
+    elementary: 'Elementary School',
+    junior_high: 'Junior High School',
+    senior_high: track_course || 'Senior High School',
+    college: track_course || 'College',
+  };
+  return map[year_level] || year_level || 'Not specified';
+}
 
 // ── FLAG DATA ─────────────────────────────────────────────────────────────────
 const FLAG_LIST = [
