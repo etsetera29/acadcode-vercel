@@ -3,35 +3,36 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>AcadCode — Daily Academic Challenge</title>
+<title>Smart Mouse — Daily Academic Challenge</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
 <style>
 :root {
-  --bg:#0c0f14; --surface:#13181f; --surface2:#1a2030; --border:#2a3244;
-  --accent:#f0c040; --accent2:#4ade80; --danger:#f87171;
-  --text:#e8eaf0; --muted:#7a8499;
+  --bg:#ffffff; --surface:#f4fdfe; --surface2:#e6f9fb; --border:#b2ecf0;
+  --accent:#1ac6cc; --accent2:#0a9ca1; --danger:#e05252;
+  --text:#0d2b2c; --muted:#5a8a8d;
+  --aqua:#82e8ec; --aqua-light:#d4f8fa; --aqua-dark:#0e8f94;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:'Instrument Sans',sans-serif;min-height:100vh;overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 20% 10%,rgba(240,192,64,.04) 0%,transparent 60%),radial-gradient(ellipse 60% 80% at 80% 90%,rgba(74,222,128,.03) 0%,transparent 60%);pointer-events:none;z-index:0}
+body{background:var(--bg);color:var(--text);font-family:'Instrument Sans',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 15% 0%,rgba(130,232,236,.18) 0%,transparent 55%),radial-gradient(ellipse 60% 50% at 90% 100%,rgba(26,198,204,.12) 0%,transparent 55%);pointer-events:none;z-index:0}
 .app{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:0 20px 60px}
-header{display:flex;align-items:center;justify-content:space-between;padding:28px 0 20px;border-bottom:1px solid var(--border);margin-bottom:36px;gap:12px;flex-wrap:wrap}
+header{display:flex;align-items:center;justify-content:space-between;padding:28px 0 20px;border-bottom:2px solid var(--border);margin-bottom:36px;gap:12px;flex-wrap:wrap}
 .logo{font-family:'DM Serif Display',serif;font-size:1.7rem;letter-spacing:-.5px}
-.logo span{color:var(--accent)}
+.logo span{color:var(--aqua-dark)}
 .header-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.streak-badge{display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:.8rem;font-weight:600;color:var(--accent);font-family:'DM Mono',monospace}
+.streak-badge{display:flex;align-items:center;gap:6px;background:var(--aqua-light);border:1px solid var(--aqua);border-radius:20px;padding:6px 14px;font-size:.8rem;font-weight:600;color:var(--aqua-dark);font-family:'DM Mono',monospace}
 .screen{display:none;animation:fadeUp .4s ease}
 .screen.active{display:block}
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 
 /* ── BUTTONS ── */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 28px;border-radius:10px;border:none;font-family:'Instrument Sans',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;transition:all .18s;text-decoration:none}
-.btn-primary{background:var(--accent);color:#0c0f14}
-.btn-primary:hover{background:#f8d060;transform:translateY(-1px);box-shadow:0 6px 20px rgba(240,192,64,.3)}
+.btn-primary{background:var(--accent);color:#ffffff}
+.btn-primary:hover{background:var(--aqua-dark);transform:translateY(-1px);box-shadow:0 6px 20px rgba(26,198,204,.3)}
 .btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none}
-.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}
-.btn-ghost:hover{color:var(--text);border-color:var(--muted)}
+.btn-ghost{background:transparent;color:var(--muted);border:1.5px solid var(--border)}
+.btn-ghost:hover{color:var(--text);border-color:var(--accent)}
 .btn-danger{background:transparent;color:var(--danger);border:1px solid rgba(248,113,113,.3)}
 .btn-danger:hover{background:rgba(248,113,113,.1)}
 .btn-sm{padding:8px 18px;font-size:.85rem}
@@ -41,15 +42,15 @@ header{display:flex;align-items:center;justify-content:space-between;padding:28p
 .field{margin-bottom:16px}
 .field label{display:block;font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px}
 .field input{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:12px 16px;color:var(--text);font-family:'Instrument Sans',sans-serif;font-size:.95rem;outline:none;transition:border-color .2s}
-.field input:focus{border-color:var(--accent)}
+.field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(26,198,204,.12)}
 .field input::placeholder{color:var(--muted)}
 .form-error{font-size:.82rem;color:var(--danger);margin-top:6px;min-height:18px}
 .form-success{font-size:.82rem;color:var(--accent2);margin-top:6px;min-height:18px}
 
 /* ── AUTH MODAL ── */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;align-items:center;justify-content:center;padding:20px}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(13,43,44,.45);backdrop-filter:blur(4px);z-index:100;align-items:center;justify-content:center;padding:20px}
 .modal-overlay.open{display:flex}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;width:100%;max-width:400px;position:relative;animation:fadeUp .3s ease}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;width:100%;max-width:400px;position:relative;animation:fadeUp .3s ease;box-shadow:0 20px 60px rgba(26,198,204,.15)}
 .modal-close{position:absolute;top:16px;right:16px;background:none;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer}
 .modal-close:hover{color:var(--text)}
 .modal h2{font-family:'DM Serif Display',serif;font-size:1.6rem;margin-bottom:6px}
@@ -58,16 +59,16 @@ header{display:flex;align-items:center;justify-content:space-between;padding:28p
 .modal-switch button{background:none;border:none;color:var(--accent);cursor:pointer;font-weight:600;font-size:.85rem}
 .tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:28px}
 .tab-btn{background:none;border:none;border-bottom:2px solid transparent;padding:10px 16px;margin-bottom:-1px;font-family:'Instrument Sans',sans-serif;font-size:.9rem;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s}
-.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-btn.active{color:var(--aqua-dark);border-bottom-color:var(--aqua-dark)}
 
 /* ── HOME ── */
 .home-hero{text-align:center;padding:20px 0 40px}
 .home-hero h1{font-family:'DM Serif Display',serif;font-size:clamp(2.4rem,6vw,3.6rem);line-height:1.1;margin-bottom:14px;letter-spacing:-1px}
-.home-hero h1 em{font-style:italic;color:var(--accent)}
+.home-hero h1 em{font-style:italic;color:var(--aqua-dark)}
 .home-hero p{color:var(--muted);font-size:1.05rem;max-width:500px;margin:0 auto 30px;line-height:1.6}
 .info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:32px}
 .info-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:center}
-.info-card .ic-num{font-family:'DM Serif Display',serif;font-size:2.4rem;color:var(--accent);display:block;line-height:1;margin-bottom:6px}
+.info-card .ic-num{font-family:'DM Serif Display',serif;font-size:2.4rem;color:var(--aqua-dark);display:block;line-height:1;margin-bottom:6px}
 .info-card .ic-label{font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
 .home-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
 
@@ -75,34 +76,34 @@ header{display:flex;align-items:center;justify-content:space-between;padding:28p
 .quiz-header{margin-bottom:28px}
 .quiz-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
 .quiz-progress-label{font-size:.8rem;color:var(--muted);font-family:'DM Mono',monospace}
-.timer-ring{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);padding:6px 14px;border-radius:8px;font-family:'DM Mono',monospace;font-size:1.1rem;font-weight:500;color:var(--accent);transition:color .3s}
+.timer-ring{display:flex;align-items:center;gap:8px;background:var(--aqua-light);border:1px solid var(--aqua);padding:6px 14px;border-radius:8px;font-family:'DM Mono',monospace;font-size:1.1rem;font-weight:500;color:var(--aqua-dark);transition:color .3s}
 .timer-ring.danger{color:var(--danger);border-color:rgba(248,113,113,.4)}
 .progress-bar-track{height:4px;background:var(--surface2);border-radius:2px;overflow:hidden}
-.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),#f8a840);border-radius:2px;transition:width .4s ease}
-.question-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;margin-bottom:20px;box-shadow:0 8px 32px rgba(0,0,0,.4)}
-.q-category{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--aqua),var(--accent));border-radius:2px;transition:width .4s ease}
+.question-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;margin-bottom:20px;box-shadow:0 8px 32px rgba(26,198,204,.1)}
+.q-category{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--aqua-dark);margin-bottom:14px;display:flex;align-items:center;gap:8px}
 .q-category::after{content:'';flex:1;height:1px;background:var(--border)}
 .q-text{font-family:'DM Serif Display',serif;font-size:1.35rem;line-height:1.55;color:var(--text);margin-bottom:8px}
-.q-code{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px 16px;font-family:'DM Mono',monospace;font-size:.88rem;color:#a8c0e0;margin:14px 0;white-space:pre-wrap;line-height:1.6}
+.q-code{background:var(--aqua-light);border:1px solid var(--border);border-radius:8px;padding:14px 16px;font-family:'DM Mono',monospace;font-size:.88rem;color:var(--aqua-dark);margin:14px 0;white-space:pre-wrap;line-height:1.6}
 .options-grid{display:flex;flex-direction:column;gap:10px}
 .option-btn{display:flex;align-items:flex-start;gap:14px;background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;padding:16px 18px;cursor:pointer;text-align:left;width:100%;font-family:'Instrument Sans',sans-serif;font-size:.95rem;color:var(--text);transition:all .15s}
-.option-btn:hover:not(:disabled){border-color:var(--accent);background:rgba(240,192,64,.06);transform:translateX(3px)}
+.option-btn:hover:not(:disabled){border-color:var(--accent);background:rgba(26,198,204,.07);transform:translateX(3px)}
 .option-btn .opt-letter{flex-shrink:0;width:26px;height:26px;display:flex;align-items:center;justify-content:center;background:var(--bg);border:1px solid var(--border);border-radius:6px;font-family:'DM Mono',monospace;font-size:.78rem;font-weight:500;color:var(--muted);transition:all .15s}
-.option-btn.correct{border-color:var(--accent2);background:rgba(74,222,128,.08)}
-.option-btn.correct .opt-letter{background:var(--accent2);color:#0c0f14;border-color:var(--accent2)}
+.option-btn.correct{border-color:var(--accent2);background:rgba(10,156,161,.08)}
+.option-btn.correct .opt-letter{background:var(--accent2);color:#fff;border-color:var(--accent2)}
 .option-btn.wrong{border-color:var(--danger);background:rgba(248,113,113,.08)}
-.option-btn.wrong .opt-letter{background:var(--danger);color:#0c0f14;border-color:var(--danger)}
+.option-btn.wrong .opt-letter{background:var(--danger);color:#fff;border-color:var(--danger)}
 .option-btn:disabled{cursor:default;transform:none}
-.explanation-box{display:none;background:var(--surface2);border:1px solid var(--border);border-left:3px solid var(--accent2);border-radius:0 10px 10px 0;padding:14px 18px;margin-top:14px;font-size:.88rem;color:var(--muted);line-height:1.6;animation:fadeUp .3s ease}
+.explanation-box{display:none;background:var(--aqua-light);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:0 10px 10px 0;padding:14px 18px;margin-top:14px;font-size:.88rem;color:var(--text);line-height:1.6;animation:fadeUp .3s ease}
 .explanation-box.show{display:block}
 .explanation-box strong{color:var(--text)}
 .quiz-nav{display:flex;justify-content:flex-end;gap:10px;margin-top:10px}
 
 /* ── RESULTS ── */
 .results-hero{text-align:center;padding:40px 20px}
-.score-circle{width:140px;height:140px;border-radius:50%;background:conic-gradient(var(--accent) calc(var(--pct)*1%),var(--surface2) 0);display:flex;align-items:center;justify-content:center;margin:0 auto 24px}
+.score-circle{width:140px;height:140px;border-radius:50%;background:conic-gradient(var(--accent) calc(var(--pct)*1%),var(--border) 0);display:flex;align-items:center;justify-content:center;margin:0 auto 24px}
 .score-circle-inner{width:110px;height:110px;border-radius:50%;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center}
-.score-num{font-family:'DM Serif Display',serif;font-size:2.4rem;color:var(--accent);line-height:1}
+.score-num{font-family:'DM Serif Display',serif;font-size:2.4rem;color:var(--aqua-dark);line-height:1}
 .score-denom{font-size:.78rem;color:var(--muted)}
 .results-hero h2{font-family:'DM Serif Display',serif;font-size:2rem;margin-bottom:8px}
 .results-hero p{color:var(--muted);margin-bottom:28px}
@@ -115,23 +116,52 @@ header{display:flex;align-items:center;justify-content:space-between;padding:28p
 /* ── LEADERBOARD ── */
 .lb-controls{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
 .lb-table{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:20px}
-.lb-header,.lb-row{display:grid;grid-template-columns:50px 1fr 80px 80px 80px;padding:12px 20px;align-items:center;font-size:.85rem}
+.lb-header,.lb-row{display:grid;grid-template-columns:50px 36px 1fr 80px 80px 80px;padding:12px 20px;align-items:center;font-size:.85rem}
 .lb-header{background:var(--surface2);color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--border)}
 .lb-row{border-bottom:1px solid rgba(42,50,68,.6);transition:background .15s}
 .lb-row:last-child{border-bottom:none}
 .lb-row:hover{background:var(--surface2)}
 .lb-rank{font-family:'DM Mono',monospace;font-weight:500}
-.lb-rank.gold{color:#f0c040}.lb-rank.silver{color:#a8b8c8}.lb-rank.bronze{color:#c87840}
+.lb-rank.gold{color:#c89000}.lb-rank.silver{color:#a8b8c8}.lb-rank.bronze{color:#c87840}
 .lb-name{font-weight:500}
-.lb-me{color:var(--accent)!important;font-weight:700!important}
-.lb-score{font-family:'DM Mono',monospace;color:var(--accent);text-align:center}
-.lb-streak{font-family:'DM Mono',monospace;color:var(--accent2);text-align:center}
+.lb-me{color:var(--aqua-dark)!important;font-weight:700!important}
+.lb-score{font-family:'DM Mono',monospace;color:var(--aqua-dark);text-align:center}
+.lb-streak{font-family:'DM Mono',monospace;color:var(--accent);text-align:center}
 .lb-games{font-family:'DM Mono',monospace;color:var(--muted);text-align:center}
 .lb-empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:.9rem}
+.lb-flag{font-size:1.2rem;text-align:center}
+
+/* ── FLAG PICKER ── */
+.flag-picker-wrap{margin-bottom:16px}
+.flag-picker-wrap label{display:block;font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px}
+.flag-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;max-height:200px;overflow-y:auto;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:10px}
+.flag-grid:focus-within{border-color:var(--accent)}
+.flag-opt{background:none;border:1.5px solid transparent;border-radius:8px;padding:6px 4px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:all .15s}
+.flag-opt:hover{border-color:var(--border);background:var(--surface)}
+.flag-opt.selected{border-color:var(--accent);background:rgba(26,198,204,.12)}
+.flag-opt .flag-em{font-size:1.4rem;line-height:1}
+.flag-opt .flag-lbl{font-size:.55rem;color:var(--muted);text-align:center;line-height:1.2;max-width:38px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.flag-opt.selected .flag-lbl{color:var(--aqua-dark)}
+.flag-selected-preview{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--aqua-light);border:1.5px solid var(--aqua);border-radius:10px;margin-bottom:8px;font-size:.88rem;color:var(--muted)}
+.flag-selected-preview .fp-em{font-size:1.6rem}
+.flag-search{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:'Instrument Sans',sans-serif;font-size:.88rem;outline:none;margin-bottom:8px;transition:border-color .2s}
+.flag-search:focus{border-color:var(--accent)}
+
+/* ── PROFILE AVATAR (flag) ── */
+.profile-avatar{width:80px;height:80px;border-radius:50%;background:var(--aqua-light);border:2.5px solid var(--aqua);display:flex;align-items:center;justify-content:center;font-size:2.8rem;margin-bottom:16px;line-height:1;box-shadow:0 4px 16px rgba(26,198,204,.2)}
+.profile-display-name{font-family:'DM Serif Display',serif;font-size:1.6rem;margin-bottom:2px}
+.profile-username{font-size:.82rem;color:var(--muted);margin-bottom:4px}
+.profile-email{font-size:.85rem;color:var(--muted);margin-bottom:20px}
+
+/* ── CHANGE NAME ── */
+.name-edit-row{display:flex;gap:8px;align-items:center;margin-bottom:20px;flex-wrap:wrap}
+.name-edit-row input{flex:1;min-width:120px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:9px 13px;color:var(--text);font-family:'Instrument Sans',sans-serif;font-size:.92rem;outline:none;transition:border-color .2s}
+.name-edit-row input:focus{border-color:var(--accent)}
+.name-edit-status{font-size:.8rem;color:var(--muted);min-height:16px;margin-top:-14px;margin-bottom:8px}
 
 /* ── PROFILE ── */
 .profile-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:20px}
-.profile-avatar{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#f8a840);display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:1.8rem;color:#0c0f14;margin-bottom:16px}
+.profile-avatar{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--aqua),var(--accent));display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:1.8rem;color:var(--text);margin-bottom:16px}
 .profile-name{font-family:'DM Serif Display',serif;font-size:1.6rem;margin-bottom:4px}
 .profile-email{font-size:.85rem;color:var(--muted);margin-bottom:20px}
 .stats-row{display:flex;gap:20px;flex-wrap:wrap}
@@ -143,7 +173,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:28p
 .review-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:14px}
 .review-item .ri-meta{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:.78rem;color:var(--muted)}
 .badge{padding:3px 8px;border-radius:4px;font-size:.72rem;font-weight:600}
-.badge-correct{background:rgba(74,222,128,.15);color:var(--accent2)}
+.badge-correct{background:rgba(10,156,161,.15);color:var(--accent2)}
 .badge-wrong{background:rgba(248,113,113,.15);color:var(--danger)}
 .badge-skip{background:rgba(122,132,153,.15);color:var(--muted)}
 .ri-q{font-weight:500;margin-bottom:8px;font-size:.95rem}
@@ -153,15 +183,15 @@ header{display:flex;align-items:center;justify-content:space-between;padding:28p
 /* ── MISC ── */
 .section-title{font-family:'DM Serif Display',serif;font-size:1.8rem;margin-bottom:22px}
 .page-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;gap:12px;flex-wrap:wrap}
-.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(240,192,64,.3);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(26,198,204,.3);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .dot-bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
-.dot{position:absolute;border-radius:50%;background:rgba(240,192,64,.05);animation:floatDot linear infinite}
+.dot{position:absolute;border-radius:50%;background:rgba(130,232,236,.15);animation:floatDot linear infinite}
 @keyframes floatDot{from{transform:translateY(100vh) scale(0);opacity:0}10%{opacity:1}90%{opacity:.6}to{transform:translateY(-20vh) scale(1);opacity:0}}
 
 @media(max-width:600px){
   .info-grid{grid-template-columns:1fr 1fr}
-  .lb-header,.lb-row{grid-template-columns:40px 1fr 60px 60px}
+  .lb-header,.lb-row{grid-template-columns:40px 30px 1fr 60px 60px}
   .lb-games{display:none}
   .results-stats{gap:14px}
 }
@@ -172,7 +202,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:28p
 
 <div class="app">
   <header>
-    <div class="logo">Acad<span>Code</span></div>
+    <div class="logo">Smart <span>Mouse</span></div>
     <div class="header-right">
       <div class="streak-badge">🔥 <span id="streakNum">0</span></div>
       <div id="authArea"></div>
@@ -184,6 +214,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:28p
     <div class="home-hero">
       <h1>10 Questions.<br/><em>Every Day.</em> Get Smarter.</h1>
       <p>Sharpen your academic edge with daily challenges across Computer Science, Math, Logic, and more.</p>
+      <div id="subjectBadge" style="display:none;margin:0.5rem auto 0;padding:0.35rem 1rem;background:var(--accent);color:#fff;border-radius:999px;font-size:0.85rem;font-weight:600;display:inline-block;">📚 Loading today's subject…</div>
       <div class="info-grid">
         <div class="info-card"><span class="ic-num">10</span><span class="ic-label">Daily Questions</span></div>
         <div class="info-card"><span class="ic-num">30s</span><span class="ic-label">Per Question</span></div>
@@ -285,10 +316,19 @@ header{display:flex;align-items:center;justify-content:space-between;padding:28p
     </div>
     <div id="modal-register" style="display:none">
       <h2>Create account</h2>
-      <p>Join AcadCode and compete globally.</p>
+      <p>Join Smart Mouse and compete globally.</p>
       <div class="field"><label>Username</label><input id="reg-user" type="text" placeholder="e.g. alex" maxlength="24"/></div>
       <div class="field"><label>Email</label><input id="reg-email" type="email" placeholder="alex@email.com"/></div>
       <div class="field"><label>Password</label><input id="reg-pass" type="password" placeholder="min 6 characters"/></div>
+      <div class="flag-picker-wrap">
+        <label>Your Flag <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(permanent &mdash; shown on leaderboard &amp; profile)</span></label>
+        <div class="flag-selected-preview" id="reg-flag-preview">
+          <span class="fp-em" id="reg-flag-em">🏳️</span>
+          <span id="reg-flag-name" style="color:var(--text)">Select a flag below</span>
+        </div>
+        <input class="flag-search" type="text" placeholder="Search country&#8230;" id="reg-flag-search" oninput="filterFlags()"/>
+        <div class="flag-grid" id="reg-flag-grid"></div>
+      </div>
       <div class="form-error" id="reg-err"></div>
       <button class="btn btn-primary" style="width:100%" id="reg-btn" onclick="doRegister()">Create Account</button>
       <div class="modal-switch">Already have an account? <button onclick="switchModal('login')">Sign in</button></div>
@@ -298,26 +338,16 @@ header{display:flex;align-items:center;justify-content:space-between;padding:28p
 
 <script>
 // ── CONFIG ──────────────────────────────────────────────────────────────────
-// Change this to your InfinityFree domain once deployed.
-// e.g. 'https://yourdomain.infinityfreeapp.com'
+// Change this to your deployed domain.
+// e.g. 'https://yourdomain.vercel.app'
 const API_BASE = window.location.origin;
 
 // ── QUESTIONS ───────────────────────────────────────────────────────────────
-const QUESTIONS = [
-  {category:"Data Structures",text:"What is the time complexity of searching in a balanced Binary Search Tree?",options:["O(1)","O(log n)","O(n)","O(n log n)"],answer:1,explanation:"<strong>O(log n)</strong> — A balanced BST halves the search space at each step. An unbalanced BST degrades to O(n)."},
-  {category:"Algorithms",text:"Which sorting algorithm guarantees O(n log n) time in the worst case?",options:["QuickSort","BubbleSort","MergeSort","SelectionSort"],answer:2,explanation:"<strong>MergeSort</strong> — It always divides the array in half and merges. QuickSort can degrade to O(n²) in the worst case."},
-  {category:"Computer Networks",text:"Which OSI layer handles IP addressing and packet routing?",options:["Layer 2 — Data Link","Layer 3 — Network","Layer 4 — Transport","Layer 5 — Session"],answer:1,explanation:"<strong>Layer 3 — Network</strong> — Handles logical addressing (IP) and routing between networks."},
-  {category:"Python",text:"What will this code print?",code:"x = [1, 2, 3]\ny = x\ny.append(4)\nprint(len(x))",options:["3","4","Error","None"],answer:1,explanation:"<strong>4</strong> — <code>y = x</code> copies the reference, not the list. Both point to the same object."},
-  {category:"Discrete Mathematics",text:"How many edges does a complete graph K₆ have?",options:["12","15","18","30"],answer:1,explanation:"<strong>15</strong> — Kₙ has n(n−1)/2 edges. For n=6: 6×5/2 = 15."},
-  {category:"Operating Systems",text:"Which scheduling algorithm can lead to the 'convoy effect'?",options:["Round Robin","Shortest Job First","First Come First Served","Priority Scheduling"],answer:2,explanation:"<strong>FCFS</strong> — A long process arriving first delays all shorter processes behind it."},
-  {category:"Database Systems",text:"In SQL, which keyword removes duplicate rows from a result set?",options:["UNIQUE","DISTINCT","DIFFERENT","FILTER"],answer:1,explanation:"<strong>DISTINCT</strong> — SELECT DISTINCT eliminates duplicate rows. UNIQUE is a column constraint."},
-  {category:"Algorithms",text:"Dijkstra's algorithm fails on graphs with:",options:["Directed edges","Negative weight edges","Cycles","Multiple components"],answer:1,explanation:"<strong>Negative weight edges</strong> — Dijkstra's greedy assumption breaks. Use Bellman-Ford instead."},
-  {category:"Computer Architecture",text:"What does 'cache hit rate' measure?",options:["RAM accesses from registers","Fraction of memory accesses served by cache","CPU cycles per instruction","Memory bus transfer speed"],answer:1,explanation:"<strong>Fraction served by cache</strong> — Higher hit rate = more data from fast cache, fewer DRAM accesses."},
-  {category:"Logic & Proofs",text:"Which equivalence is De Morgan's Law?",options:["¬(P ∧ Q) ≡ ¬P ∨ ¬Q","P → Q ≡ P ∧ ¬Q","P ∨ (Q ∧ R) ≡ (P ∨ Q) ∧ R","¬P → ¬Q ≡ P → Q"],answer:0,explanation:"<strong>¬(P ∧ Q) ≡ ¬P ∨ ¬Q</strong> — Negation of a conjunction equals disjunction of negations."}
-];
+let QUESTIONS = [];
+let DAILY_SUBJECT = '';
 
 // ── STATE ────────────────────────────────────────────────────────────────────
-let session = JSON.parse(localStorage.getItem('acadcode_session') || 'null');
+let session = JSON.parse(localStorage.getItem('smartmouse_session') || 'null');
 let quiz = {};
 
 // ── API ──────────────────────────────────────────────────────────────────────
@@ -352,6 +382,7 @@ function closeModal() { document.getElementById('authModal').classList.remove('o
 function switchModal(tab) {
   document.getElementById('modal-login').style.display    = tab === 'login'    ? '' : 'none';
   document.getElementById('modal-register').style.display = tab === 'register' ? '' : 'none';
+  if (tab === 'register') { selectedFlag = null; buildFlagGrid(); }
 }
 
 async function doLogin() {
@@ -365,7 +396,7 @@ async function doLogin() {
   try {
     const data = await api('POST', 'login', {username: user, password: pass}, false);
     session = {token: data.token, user: data.user};
-    localStorage.setItem('acadcode_session', JSON.stringify(session));
+    localStorage.setItem('smartmouse_session', JSON.stringify(session));
     closeModal();
     renderAuthArea();
   } catch(e) {
@@ -383,15 +414,17 @@ async function doRegister() {
   const btn   = document.getElementById('reg-btn');
   errEl.textContent = '';
   if (!user || !email || !pass) { errEl.textContent = 'Please fill in all fields.'; return; }
+  if (!selectedFlag) { errEl.textContent = 'Please select a flag for your profile.'; return; }
   btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Creating…';
   try {
-    await api('POST', 'register', {username: user, email, password: pass}, false);
+    await api('POST', 'register', {username: user, email, password: pass, flag: selectedFlag}, false);
     // Auto-login after register
     const data = await api('POST', 'login', {username: user, password: pass}, false);
     session = {token: data.token, user: data.user};
-    localStorage.setItem('acadcode_session', JSON.stringify(session));
+    localStorage.setItem('smartmouse_session', JSON.stringify(session));
     closeModal();
     renderAuthArea();
+    checkDailyStatus();
   } catch(e) {
     errEl.textContent = e.message;
   } finally {
@@ -402,7 +435,7 @@ async function doRegister() {
 async function doLogout() {
   try { await api('POST', 'logout', {}); } catch(e) {}
   session = null;
-  localStorage.removeItem('acadcode_session');
+  localStorage.removeItem('smartmouse_session');
   renderAuthArea();
   showScreen('home');
 }
@@ -416,7 +449,22 @@ function showScreen(id) {
 }
 
 // ── QUIZ ──────────────────────────────────────────────────────────────────────
-function startQuiz() {
+async function startQuiz() {
+  // If questions weren't pre-loaded on page init, fetch them now
+  if (QUESTIONS.length === 0) {
+    const btn = document.querySelector('[onclick="startQuiz()"]');
+    if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Loading…'; }
+    try {
+      const data = await api('GET', 'questions', null, false);
+      QUESTIONS = data.questions;
+      DAILY_SUBJECT = data.subject;
+    } catch(e) {
+      if (btn) { btn.disabled = false; btn.textContent = 'Start Quiz'; }
+      alert('Could not load today\'s questions: ' + e.message + '\nPlease try again in a moment.');
+      return;
+    }
+    if (btn) { btn.disabled = false; btn.textContent = 'Start Quiz'; }
+  }
   quiz = {current:0, answers:Array(QUESTIONS.length).fill(null).map(()=>({selected:null,correct:false})), score:0, timer:null, timeLeft:30, answered:false};
   showScreen('quiz');
   renderQ();
@@ -531,10 +579,10 @@ async function showResults() {
     try {
       const res = await api('POST', 'submit', {score: quiz.score, total_questions: total});
       session.user.streak = res.streak;
-      localStorage.setItem('acadcode_session', JSON.stringify(session));
+      localStorage.setItem('smartmouse_session', JSON.stringify(session));
       document.getElementById('streakNum').textContent = '🔥 ' + res.streak;
       document.getElementById('r-streak').textContent = '🔥 ' + res.streak;
-      statusEl.style.color = 'var(--accent2)';
+      statusEl.style.color = 'var(--accent)';
       statusEl.textContent = `✓ Saved! Your global rank: #${res.rank}`;
       // Lock the start/retry buttons — attempt used for today
       lockStartButton(res.nextResetMs, quiz.score, total);
@@ -603,10 +651,11 @@ function renderLbTable(rows, container) {
   const myId  = session?.user?.id;
   if (!rows.length) { container.innerHTML = '<div class="lb-table"><div class="lb-empty">No scores yet for this period.</div></div>'; return; }
   container.innerHTML = `<div class="lb-table">
-    <div class="lb-header"><div>Rank</div><div>Player</div><div style="text-align:center">Best</div><div style="text-align:center">Streak</div><div class="lb-games" style="text-align:center">Games</div></div>
+    <div class="lb-header"><div>Rank</div><div></div><div>Player</div><div style="text-align:center">Best</div><div style="text-align:center">Streak</div><div class="lb-games" style="text-align:center">Games</div></div>
     ${rows.map((r,i) => `<div class="lb-row">
       <div class="lb-rank ${rCls[i]||''}">${ranks[i]||'#'+(i+1)}</div>
-      <div class="lb-name ${r.id===myId?'lb-me':''}">${esc(r.username)}${r.id===myId?' (you)':''}</div>
+      <div class="lb-flag">${r.flag||'🏳️'}</div>
+      <div class="lb-name ${r.id===myId?'lb-me':''}">${esc(r.display_name||r.username)}${r.id===myId?' (you)':''}</div>
       <div class="lb-score">${r.best_score}/10</div>
       <div class="lb-streak">🔥${r.streak}</div>
       <div class="lb-games">${r.games}</div>
@@ -624,12 +673,18 @@ async function loadProfile() {
     const u = data.user;
     el.innerHTML = `
       <div class="profile-card">
-        <div class="profile-avatar">${u.username.charAt(0).toUpperCase()}</div>
-        <div class="profile-name">${esc(u.username)}</div>
+        <div class="profile-avatar">${u.flag||'🏳️'}</div>
+        <div class="profile-display-name">${esc(u.display_name||u.username)}</div>
+        <div class="profile-username">@${esc(u.username)}</div>
         <div class="profile-email">${esc(u.email)}</div>
+        <div class="name-edit-row">
+          <input id="name-edit-input" type="text" value="${esc(u.display_name||u.username)}" maxlength="32" placeholder="Display name"/>
+          <button class="btn btn-ghost btn-xs" onclick="saveDisplayName()">Save</button>
+        </div>
+        <div class="name-edit-status" id="name-edit-status"></div>
         <div class="stats-row">
-          <div class="stat-box"><span class="sb-val" style="color:var(--accent)">🔥${u.streak}</span><span class="sb-key">Streak</span></div>
-          <div class="stat-box"><span class="sb-val" style="color:var(--accent2)">${u.best}/10</span><span class="sb-key">Best Score</span></div>
+          <div class="stat-box"><span class="sb-val" style="color:var(--aqua-dark)">🔥${u.streak}</span><span class="sb-key">Streak</span></div>
+          <div class="stat-box"><span class="sb-val" style="color:var(--aqua-dark)">${u.best}/10</span><span class="sb-key">Best Score</span></div>
           <div class="stat-box"><span class="sb-val">${u.games}</span><span class="sb-key">Games</span></div>
           <div class="stat-box"><span class="sb-val">${u.avg}</span><span class="sb-key">Avg Score</span></div>
         </div>
@@ -651,6 +706,107 @@ async function loadProfile() {
 // ── UTILS ─────────────────────────────────────────────────────────────────────
 function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
+
+// ── FLAG DATA ─────────────────────────────────────────────────────────────────
+const FLAG_LIST = [
+  ['🇦🇫','Afghanistan'],['🇦🇱','Albania'],['🇩🇿','Algeria'],['🇦🇩','Andorra'],['🇦🇴','Angola'],
+  ['🇦🇬','Antigua & Barbuda'],['🇦🇷','Argentina'],['🇦🇲','Armenia'],['🇦🇺','Australia'],
+  ['🇦🇹','Austria'],['🇦🇿','Azerbaijan'],['🇧🇸','Bahamas'],['🇧🇭','Bahrain'],['🇧🇩','Bangladesh'],
+  ['🇧🇧','Barbados'],['🇧🇾','Belarus'],['🇧🇪','Belgium'],['🇧🇿','Belize'],['🇧🇯','Benin'],
+  ['🇧🇹','Bhutan'],['🇧🇴','Bolivia'],['🇧🇦','Bosnia & Herzegovina'],['🇧🇼','Botswana'],
+  ['🇧🇷','Brazil'],['🇧🇳','Brunei'],['🇧🇬','Bulgaria'],['🇧🇫','Burkina Faso'],['🇧🇮','Burundi'],
+  ['🇨🇻','Cabo Verde'],['🇰🇭','Cambodia'],['🇨🇲','Cameroon'],['🇨🇦','Canada'],
+  ['🇨🇫','Central African Republic'],['🇹🇩','Chad'],['🇨🇱','Chile'],['🇨🇳','China'],
+  ['🇨🇴','Colombia'],['🇰🇲','Comoros'],['🇨🇬','Congo'],['🇨🇷','Costa Rica'],['🇭🇷','Croatia'],
+  ['🇨🇺','Cuba'],['🇨🇾','Cyprus'],['🇨🇿','Czechia'],['🇩🇰','Denmark'],['🇩🇯','Djibouti'],
+  ['🇩🇲','Dominica'],['🇩🇴','Dominican Republic'],['🇪🇨','Ecuador'],['🇪🇬','Egypt'],
+  ['🇸🇻','El Salvador'],['🇬🇶','Equatorial Guinea'],['🇪🇷','Eritrea'],['🇪🇪','Estonia'],
+  ['🇸🇿','Eswatini'],['🇪🇹','Ethiopia'],['🇫🇯','Fiji'],['🇫🇮','Finland'],['🇫🇷','France'],
+  ['🇬🇦','Gabon'],['🇬🇲','Gambia'],['🇬🇪','Georgia'],['🇩🇪','Germany'],['🇬🇭','Ghana'],
+  ['🇬🇷','Greece'],['🇬🇩','Grenada'],['🇬🇹','Guatemala'],['🇬🇳','Guinea'],
+  ['🇬🇼','Guinea-Bissau'],['🇬🇾','Guyana'],['🇭🇹','Haiti'],['🇭🇳','Honduras'],['🇭🇺','Hungary'],
+  ['🇮🇸','Iceland'],['🇮🇳','India'],['🇮🇩','Indonesia'],['🇮🇷','Iran'],['🇮🇶','Iraq'],
+  ['🇮🇪','Ireland'],['🇮🇱','Israel'],['🇮🇹','Italy'],['🇯🇲','Jamaica'],['🇯🇵','Japan'],
+  ['🇯🇴','Jordan'],['🇰🇿','Kazakhstan'],['🇰🇪','Kenya'],['🇰🇮','Kiribati'],['🇽🇰','Kosovo'],
+  ['🇰🇼','Kuwait'],['🇰🇬','Kyrgyzstan'],['🇱🇦','Laos'],['🇱🇻','Latvia'],['🇱🇧','Lebanon'],
+  ['🇱🇸','Lesotho'],['🇱🇷','Liberia'],['🇱🇾','Libya'],['🇱🇮','Liechtenstein'],['🇱🇹','Lithuania'],
+  ['🇱🇺','Luxembourg'],['🇲🇬','Madagascar'],['🇲🇼','Malawi'],['🇲🇾','Malaysia'],
+  ['🇲🇻','Maldives'],['🇲🇱','Mali'],['🇲🇹','Malta'],['🇲🇭','Marshall Islands'],
+  ['🇲🇷','Mauritania'],['🇲🇺','Mauritius'],['🇲🇽','Mexico'],['🇫🇲','Micronesia'],
+  ['🇲🇩','Moldova'],['🇲🇨','Monaco'],['🇲🇳','Mongolia'],['🇲🇪','Montenegro'],['🇲🇦','Morocco'],
+  ['🇲🇿','Mozambique'],['🇲🇲','Myanmar'],['🇳🇦','Namibia'],['🇳🇷','Nauru'],['🇳🇵','Nepal'],
+  ['🇳🇱','Netherlands'],['🇳🇿','New Zealand'],['🇳🇮','Nicaragua'],['🇳🇪','Niger'],
+  ['🇳🇬','Nigeria'],['🇰🇵','North Korea'],['🇲🇰','North Macedonia'],['🇳🇴','Norway'],
+  ['🇴🇲','Oman'],['🇵🇰','Pakistan'],['🇵🇼','Palau'],['🇵🇸','Palestine'],['🇵🇦','Panama'],
+  ['🇵🇬','Papua New Guinea'],['🇵🇾','Paraguay'],['🇵🇪','Peru'],['🇵🇭','Philippines'],
+  ['🇵🇱','Poland'],['🇵🇹','Portugal'],['🇶🇦','Qatar'],['🇷🇴','Romania'],['🇷🇺','Russia'],
+  ['🇷🇼','Rwanda'],['🇰🇳','Saint Kitts & Nevis'],['🇱🇨','Saint Lucia'],
+  ['🇻🇨','Saint Vincent & Grenadines'],['🇼🇸','Samoa'],['🇸🇲','San Marino'],
+  ['🇸🇹','São Tomé & Príncipe'],['🇸🇦','Saudi Arabia'],['🇸🇳','Senegal'],['🇷🇸','Serbia'],
+  ['🇸🇨','Seychelles'],['🇸🇱','Sierra Leone'],['🇸🇬','Singapore'],['🇸🇰','Slovakia'],
+  ['🇸🇮','Slovenia'],['🇸🇧','Solomon Islands'],['🇸🇴','Somalia'],['🇿🇦','South Africa'],
+  ['🇸🇸','South Sudan'],['🇪🇸','Spain'],['🇱🇰','Sri Lanka'],['🇸🇩','Sudan'],
+  ['🇸🇷','Suriname'],['🇸🇪','Sweden'],['🇨🇭','Switzerland'],['🇸🇾','Syria'],['🇹🇼','Taiwan'],
+  ['🇹🇯','Tajikistan'],['🇹🇿','Tanzania'],['🇹🇭','Thailand'],['🇹🇱','Timor-Leste'],
+  ['🇹🇬','Togo'],['🇹🇴','Tonga'],['🇹🇹','Trinidad & Tobago'],['🇹🇳','Tunisia'],
+  ['🇹🇷','Turkey'],['🇹🇲','Turkmenistan'],['🇹🇻','Tuvalu'],['🇺🇬','Uganda'],['🇺🇦','Ukraine'],
+  ['🇦🇪','United Arab Emirates'],['🇬🇧','United Kingdom'],['🇺🇸','United States'],
+  ['🇺🇾','Uruguay'],['🇺🇿','Uzbekistan'],['🇻🇺','Vanuatu'],['🇻🇪','Venezuela'],
+  ['🇻🇳','Vietnam'],['🇾🇪','Yemen'],['🇿🇲','Zambia'],['🇿🇼','Zimbabwe']
+];
+
+let selectedFlag = null;
+
+function buildFlagGrid(filter = '') {
+  const grid = document.getElementById('reg-flag-grid');
+  if (!grid) return;
+  const q = filter.toLowerCase();
+  const filtered = q ? FLAG_LIST.filter(([,name]) => name.toLowerCase().includes(q)) : FLAG_LIST;
+  grid.innerHTML = filtered.map(([em, name]) =>
+    `<button type="button" class="flag-opt${selectedFlag===em?' selected':''}" onclick="selectFlag('${em}','${name}')" title="${name}">
+      <span class="flag-em">${em}</span>
+      <span class="flag-lbl">${name}</span>
+    </button>`
+  ).join('');
+}
+
+function selectFlag(em, name) {
+  selectedFlag = em;
+  document.getElementById('reg-flag-em').textContent   = em;
+  document.getElementById('reg-flag-name').textContent = name;
+  buildFlagGrid(document.getElementById('reg-flag-search')?.value || '');
+}
+
+function filterFlags() {
+  buildFlagGrid(document.getElementById('reg-flag-search').value);
+}
+
+// ── DISPLAY NAME CHANGE ───────────────────────────────────────────────────────
+async function saveDisplayName() {
+  const input  = document.getElementById('name-edit-input');
+  const status = document.getElementById('name-edit-status');
+  if (!input) return;
+  const val = input.value.trim();
+  if (val.length < 2 || val.length > 32) {
+    status.style.color = 'var(--danger)';
+    status.textContent = 'Name must be 2–32 characters.';
+    return;
+  }
+  status.style.color = 'var(--muted)';
+  status.textContent = 'Saving…';
+  try {
+    await api('PATCH', 'me', {display_name: val});
+    status.style.color = 'var(--aqua-dark)';
+    status.textContent = '✓ Display name updated!';
+    // Update profile heading live
+    const heading = document.querySelector('.profile-display-name');
+    if (heading) heading.textContent = val;
+  } catch(e) {
+    status.style.color = 'var(--danger)';
+    status.textContent = e.message;
+  }
+}
+
 // ── DAILY LIMIT (Philippine Time) ─────────────────────────────────────────────
 let dailyCountdownInterval = null;
 
@@ -664,7 +820,20 @@ function fmtCountdown(ms) {
 }
 
 async function checkDailyStatus() {
-  if (!session) return; // guest — no gate
+  // Always show today's subject badge (no auth needed)
+  try {
+    const qdata = await api('GET', 'questions', null, false);
+    DAILY_SUBJECT = qdata.subject;
+    const badge = document.getElementById('subjectBadge');
+    if (badge) { badge.textContent = '📚 Today: ' + DAILY_SUBJECT; badge.style.display = 'inline-block'; }
+    // Pre-load questions into QUESTIONS so they're ready for the quiz
+    QUESTIONS = qdata.questions;
+  } catch(e) {
+    const badge = document.getElementById('subjectBadge');
+    if (badge) { badge.textContent = '📚 Questions loading…'; badge.style.display = 'inline-block'; }
+  }
+
+  if (!session) return; // guest — no daily gate
   try {
     const data = await api('GET', 'status');
     if (data.played) {
