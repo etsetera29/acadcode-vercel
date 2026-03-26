@@ -46,16 +46,13 @@ export default async function handler(req, res) {
         q.subject,
         u.year_level,
         u.track_course,
-        ROUND(AVG(sc.score)::numeric, 2)       AS avg_score,
-        COUNT(DISTINCT sc.user_id)::int        AS player_count
+        ROUND(AVG(sc.score)::numeric, 2)    AS avg_score,
+        COUNT(DISTINCT sc.user_id)::int     AS player_count
       FROM scores sc
       JOIN users u ON u.id = sc.user_id
-      JOIN (
-        SELECT DISTINCT
-          (submitted_at AT TIME ZONE 'Asia/Manila')::date AS score_date,
-          subject
-        FROM questions
-      ) q ON (sc.submitted_at AT TIME ZONE 'Asia/Manila')::date = q.score_date
+      JOIN questions q
+        ON (sc.submitted_at AT TIME ZONE 'Asia/Manila')::date
+         = (q.question_date AT TIME ZONE 'Asia/Manila')::date
       GROUP BY q.subject, u.year_level, u.track_course
       HAVING COUNT(DISTINCT sc.user_id) >= 1
     `;
