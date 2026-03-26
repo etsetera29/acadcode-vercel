@@ -10,19 +10,16 @@ export default async function handler(req, res) {
   const limit  = Math.min(parseInt(req.query?.limit  ?? '20', 10), 100);
   const period = req.query?.period ?? 'all';
 
-  // neon() is a tagged template function. Calling sql(stringsArray, ...values)
-  // is identical to the sql`...` syntax, letting us build queries dynamically
-  // without unsupported fragment interpolation.
-
   const tail = `
-    GROUP  BY u.id, u.username, u.streak
+    GROUP  BY u.id, u.username, u.display_name, u.flag, u.streak
     ORDER  BY best_score DESC, u.streak DESC, games_played DESC
-    LIMIT  `;  // $1 will be appended as the interpolated value
+    LIMIT  `;
 
   const selectFrom = `
     SELECT
         u.id,
-        u.username,
+        COALESCE(u.display_name, u.username) AS display_name,
+        u.flag,
         MAX(sc.score)        AS best_score,
         COUNT(sc.id)         AS games_played,
         u.streak,
@@ -34,9 +31,8 @@ export default async function handler(req, res) {
   let rows;
 
   if (period === 'today') {
-    // sql`${selectFrom}WHERE sc.submitted_at::date = CURRENT_DATE${tail}${limit}`
     rows = await sql(
-      [selectFrom + `WHERE  sc.submitted_at::date = CURRENT_DATE` + tail, ``],
+      [selectFrom + `WHERE  (sc.submitted_at AT TIME ZONE 'Asia/Manila')::date = (NOW() AT TIME ZONE 'Asia/Manila')::date` + tail, ``],
       limit
     );
   } else if (period === 'week') {
@@ -52,13 +48,14 @@ export default async function handler(req, res) {
   }
 
   const leaderboard = rows.map((row, i) => ({
-    rank:        i + 1,
-    id:          Number(row.id),
-    username:    row.username,
-    best_score:  Number(row.best_score),
-    games:       Number(row.games_played),
-    streak:      Number(row.streak),
-    last_played: row.last_played,
+    rank:         i + 1,
+    id:           Number(row.id),
+    display_name: row.display_name,
+    flag:         row.flag ?? '🏳️',
+    best_score:   Number(row.best_score),
+    games:        Number(row.games_played),
+    streak:       Number(row.streak),
+    last_played:  row.last_played,
   }));
 
   ok(res, { period, count: leaderboard.length, leaderboard });
