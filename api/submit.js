@@ -19,9 +19,12 @@ export default async function handler(req, res) {
 
   if (isNaN(score) || score < 0 || score > total) return err(res, 'Invalid score value.');
 
+  // Use Philippine Time (UTC+8) for daily boundary — resets at midnight PHT
   const dup = await sql`
     SELECT id FROM scores
-    WHERE  user_id = ${userId} AND submitted_at::date = CURRENT_DATE
+    WHERE  user_id = ${userId}
+      AND (submitted_at AT TIME ZONE 'Asia/Manila')::date
+        = (NOW() AT TIME ZONE 'Asia/Manila')::date
   `;
   if (dup.length) return err(res, 'You have already submitted a score today. Come back tomorrow!', 409);
 
@@ -42,5 +45,12 @@ export default async function handler(req, res) {
     WHERE sub.best > ${score} OR (sub.best = ${score} AND sub.stk > ${streak})
   `;
 
-  ok(res, { message: 'Score saved!', score, streak, rank: Number(rankRow[0].rank_pos) });
+  // ms until midnight Philippine Time (UTC+8) for frontend countdown
+  const nowUtcMs           = Date.now();
+  const phtOffsetMs        = 8 * 60 * 60 * 1000;
+  const nowPhtMs           = nowUtcMs + phtOffsetMs;
+  const todayPhtMidnightMs = Math.floor(nowPhtMs / 86_400_000) * 86_400_000;
+  const nextResetMs        = (todayPhtMidnightMs + 86_400_000) - nowPhtMs;
+
+  ok(res, { message: 'Score saved!', score, streak, rank: Number(rankRow[0].rank_pos), nextResetMs });
 }
