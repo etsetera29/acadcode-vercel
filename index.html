@@ -536,6 +536,8 @@ async function showResults() {
       document.getElementById('r-streak').textContent = '🔥 ' + res.streak;
       statusEl.style.color = 'var(--accent2)';
       statusEl.textContent = `✓ Saved! Your global rank: #${res.rank}`;
+      // Lock the start/retry buttons — attempt used for today
+      lockStartButton(res.nextResetMs, quiz.score, total);
     } catch(e) {
       statusEl.style.color = 'var(--muted)';
       statusEl.textContent = e.message.includes('already') ? '⚠ Already submitted today.' : '⚠ Could not save — check connection.';
@@ -649,9 +651,75 @@ async function loadProfile() {
 // ── UTILS ─────────────────────────────────────────────────────────────────────
 function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
+// ── DAILY LIMIT (Philippine Time) ─────────────────────────────────────────────
+let dailyCountdownInterval = null;
+
+function fmtCountdown(ms) {
+  if (ms <= 0) return '00:00:00';
+  const totalSec = Math.floor(ms / 1000);
+  const h = String(Math.floor(totalSec / 3600)).padStart(2,'0');
+  const m = String(Math.floor((totalSec % 3600) / 60)).padStart(2,'0');
+  const s = String(totalSec % 60).padStart(2,'0');
+  return `${h}:${m}:${s}`;
+}
+
+async function checkDailyStatus() {
+  if (!session) return; // guest — no gate
+  try {
+    const data = await api('GET', 'status');
+    if (data.played) {
+      lockStartButton(data.nextResetMs, data.score, data.total);
+    }
+  } catch(e) {
+    // silently ignore — don't block the UI on network error
+  }
+}
+
+function lockStartButton(nextResetMs, score, total) {
+  clearInterval(dailyCountdownInterval);
+
+  const startBtn  = document.querySelector('#screen-home .btn-primary');
+  const retryBtn  = document.querySelector('#screen-results .btn-primary.btn-sm');
+
+  function applyLock(btn) {
+    if (!btn) return;
+    btn.disabled = true;
+    btn.onclick = null;
+  }
+  applyLock(startBtn);
+  applyLock(retryBtn);
+
+  // Insert or update the "played today" notice
+  let notice = document.getElementById('played-today-notice');
+  if (!notice) {
+    notice = document.createElement('div');
+    notice.id = 'played-today-notice';
+    notice.style.cssText = 'margin-top:14px;padding:14px 18px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;font-size:.9rem;color:var(--muted);text-align:center;line-height:1.7';
+    const homeActions = document.querySelector('.home-actions');
+    homeActions.insertAdjacentElement('afterend', notice);
+  }
+
+  let deadline = Date.now() + nextResetMs;
+
+  function tick() {
+    const remaining = deadline - Date.now();
+    const scoreStr = (score !== null && total !== null) ? ` You scored <strong style="color:var(--accent)">${score}/${total}</strong>.` : '';
+    notice.innerHTML = `✅ You've completed today's set.${scoreStr}<br>
+      Next set unlocks in <strong style="color:var(--accent);font-family:'DM Mono',monospace">${fmtCountdown(remaining)}</strong> (resets at midnight PH time)`;
+    if (remaining <= 0) {
+      clearInterval(dailyCountdownInterval);
+      notice.innerHTML = '🎉 New set available! <a href="" style="color:var(--accent)" onclick="location.reload();return false">Reload to play</a>';
+    }
+  }
+
+  tick();
+  dailyCountdownInterval = setInterval(tick, 1000);
+}
+
 // ── INIT ──────────────────────────────────────────────────────────────────────
 (function init() {
   renderAuthArea();
+  checkDailyStatus(); // check if logged-in user already played today
 
   // Floating dots bg
   const bg = document.getElementById('dotBg');
