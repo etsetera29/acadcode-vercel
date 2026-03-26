@@ -31,10 +31,12 @@ export default async function handler(req, res) {
   if (req.method !== 'GET') return err(res, 'Method not allowed.', 405);
 
   const userRow = await sql`
-    SELECT display_name, flag FROM users WHERE id = ${userId}
+    SELECT display_name, flag, year_level, track_course FROM users WHERE id = ${userId}
   `;
   const display_name = userRow[0]?.display_name ?? auth.username;
   const flag         = userRow[0]?.flag         ?? '🏳️';
+  const year_level   = userRow[0]?.year_level   ?? 'college';
+  const track_course = userRow[0]?.track_course ?? null;
 
   const stats = await sql`
     SELECT COUNT(*)                AS games,
@@ -59,6 +61,8 @@ export default async function handler(req, res) {
       username:     auth.username,
       display_name,
       flag,
+      year_level,
+      track_course,
       email:        auth.email,
       streak,
       games:        Number(s.games),
