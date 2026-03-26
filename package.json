@@ -1,10 +1,10 @@
 {
   "name": "acadcode",
-  "version": "2.0.0",
-  "description": "AcadCode — quiz platform (Vercel + Vercel Postgres)",
+  "version": "2.1.0",
+  "description": "AcadCode — quiz platform (Vercel + Neon Postgres + Claude AI)",
   "type": "module",
   "dependencies": {
-    "@vercel/postgres": "^0.10.0",
+    "@neondatabase/serverless": "^0.9.5",
     "bcryptjs": "^2.4.3"
   }
 }
