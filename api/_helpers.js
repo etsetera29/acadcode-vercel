@@ -87,20 +87,23 @@ export async function requireAuth(req, res) {
   return row;
 }
 
-// ─── Streak calculator ────────────────────────────────────────────
+// ─── Streak calculator (uses Philippine Time UTC+8) ───────────────────────────
 export async function recalcStreak(userId) {
   const rows = await sql`
-    SELECT submitted_at::date AS day
+    SELECT (submitted_at AT TIME ZONE 'Asia/Manila')::date AS day
     FROM   scores
     WHERE  user_id = ${userId}
     GROUP  BY day
     ORDER  BY day DESC
   `;
 
-  let streak   = 0;
-  const today  = new Date();
-  today.setHours(0, 0, 0, 0);
-  let expected = today.getTime();
+  let streak = 0;
+
+  // "Today" in PHT
+  const phtOffsetMs = 8 * 60 * 60 * 1000;
+  const nowPhtMs    = Date.now() + phtOffsetMs;
+  const todayPht    = new Date(Math.floor(nowPhtMs / 86_400_000) * 86_400_000);
+  let expected      = todayPht.getTime();
 
   for (const { day } of rows) {
     const d = new Date(day);
