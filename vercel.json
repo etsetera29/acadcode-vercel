@@ -1,4 +1,10 @@
 {
+  "crons": [
+    {
+      "path": "/api/generate-questions",
+      "schedule": "0 16 * * *"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
