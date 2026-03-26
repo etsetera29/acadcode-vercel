@@ -97,7 +97,7 @@ export default async function handler(req, res) {
     if (!response.ok) {
       const body = await response.text();
       console.error('Gemini API error:', response.status, body);
-      return err(res, 'AI generation failed. Try again later.', 502);
+      return err(res, `Gemini error ${response.status}: ${body}`, 502);
     }
 
     const data = await response.json();
@@ -112,7 +112,7 @@ export default async function handler(req, res) {
     }
   } catch (e) {
     console.error('Question parse error:', e);
-    return err(res, 'Failed to parse AI response. Try again.', 502);
+    return err(res, `Parse error: ${e.message}`, 502);
   }
 
   // Save to DB
