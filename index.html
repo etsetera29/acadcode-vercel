@@ -13,6 +13,14 @@
   --text:#0d2b2c; --muted:#5a8a8d;
   --aqua:#82e8ec; --aqua-light:#d4f8fa; --aqua-dark:#0e8f94;
 }
+/* ── DARK MODE ── */
+body.dark {
+  --bg:#0f1c1d; --surface:#162526; --surface2:#1d3133; --border:#254748;
+  --accent:#2dd4da; --accent2:#1aacb2; --danger:#f07070;
+  --text:#d8f5f6; --muted:#6fa8aa;
+  --aqua:#3ecdd2; --aqua-light:#1a3536; --aqua-dark:#42d9df;
+}
+body.dark::before{background:radial-gradient(ellipse 80% 60% at 15% 0%,rgba(45,212,218,.10) 0%,transparent 55%),radial-gradient(ellipse 60% 50% at 90% 100%,rgba(45,212,218,.07) 0%,transparent 55%)}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-text-size-adjust:100%}
 body{background:var(--bg);color:var(--text);font-family:'Instrument Sans',sans-serif;min-height:100vh;overflow-x:hidden;}
@@ -253,7 +261,37 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
   .results-actions .btn{flex:1;min-width:0;font-size:.85rem;padding:11px 14px}
   .lb-controls{gap:6px}
   .lb-controls .btn-xs{padding:7px 12px;font-size:.76rem}
+  .ins-tabs{flex-wrap:wrap;gap:6px}
+  .ins-tab-btn{font-size:.75rem;padding:6px 10px}
+  .ins-bubble-wrap{gap:10px;padding:16px 10px}
+  .ins-bubble{width:80px !important;height:80px !important;font-size:.7rem}
+  .ins-bubble-score{font-size:.95rem !important}
+  .ins-bubble-name{font-size:.58rem !important}
 }
+/* ── DARK TOGGLE ── */
+.dark-toggle{background:none;border:1.5px solid var(--border);border-radius:20px;padding:5px 10px;font-size:1rem;cursor:pointer;transition:all .2s;line-height:1;color:var(--text)}
+.dark-toggle:hover{border-color:var(--accent);background:var(--surface2)}
+/* ── TOP-1 BADGE ── */
+.top1-badge{display:inline-flex;align-items:center;gap:2px;font-family:'DM Mono',monospace;font-size:.8rem;font-weight:600;color:#b45309;background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.4);border-radius:12px;padding:2px 7px}
+body.dark .top1-badge{color:#fbbf24;background:rgba(251,191,36,.12);border-color:rgba(251,191,36,.3)}
+/* ── INSIGHT BUBBLE CHART ── */
+.ins-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:18px;scrollbar-width:none}
+.ins-tabs::-webkit-scrollbar{display:none}
+.ins-tab-btn{flex-shrink:0;background:var(--surface2);border:1.5px solid var(--border);border-radius:20px;padding:7px 14px;font-size:.8rem;font-weight:500;color:var(--muted);cursor:pointer;transition:all .18s;font-family:'Instrument Sans',sans-serif;white-space:nowrap}
+.ins-tab-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.ins-panel-hidden{display:none}
+.ins-champion{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(26,198,204,.15),rgba(10,156,161,.08));border:1px solid var(--aqua);border-radius:10px;padding:8px 14px;font-size:.82rem;margin-bottom:16px;color:var(--text)}
+.ins-champion strong{color:var(--aqua-dark)}
+body.dark .ins-champion strong{color:var(--aqua-dark)}
+.ins-bubble-wrap{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:14px;padding:20px 8px}
+.ins-bubble{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:50%;border:2px solid;cursor:default;transition:transform .2s,box-shadow .2s;text-align:center;padding:6px}
+.ins-bubble:hover{transform:scale(1.08);box-shadow:0 6px 24px rgba(0,0,0,.13)}
+.ins-bubble-top{border-width:2.5px;box-shadow:0 4px 16px rgba(26,198,204,.2)}
+.ins-bubble-crown{position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-size:.95rem;filter:drop-shadow(0 1px 3px rgba(0,0,0,.2))}
+.ins-bubble-score{font-family:'DM Serif Display',serif;font-size:1.15rem;font-weight:700;line-height:1}
+.ins-bubble-name{font-size:.62rem;font-weight:600;text-align:center;line-height:1.2;margin-top:2px;opacity:.85}
+.ins-bubble-players{font-size:.6rem;opacity:.7;margin-top:2px}
+.ins-note{color:var(--muted);font-size:.75rem;text-align:center;margin-top:10px;padding:0 8px}
 </style>
 </head>
 <body>
@@ -264,6 +302,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
     <div class="logo">Smart <span>Mouse</span></div>
     <div class="header-right">
       <div class="streak-badge">🔥 <span id="streakNum">0</span></div>
+      <button class="dark-toggle" id="darkToggle" onclick="toggleDark()" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
       <div id="authArea"></div>
     </div>
   </header>
@@ -349,7 +388,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
     <div id="lb-tab-rankings">
       <div class="lb-controls">
         <button class="btn btn-ghost btn-xs active" id="lbp-all"   onclick="loadLeaderboard('all')">All Time</button>
-        <button class="btn btn-ghost btn-xs"        id="lbp-week"  onclick="loadLeaderboard('week')">This Week</button>
+        <button class="btn btn-ghost btn-xs"        id="lbp-month" onclick="loadLeaderboard('month')">This Month</button>
         <button class="btn btn-ghost btn-xs"        id="lbp-today" onclick="loadLeaderboard('today')">Today</button>
       </div>
       <div class="lb-yl-filter">
@@ -445,7 +484,25 @@ let DAILY_SUBJECT = '';
 let session = JSON.parse(localStorage.getItem('smartmouse_session') || 'null');
 let quiz = {};
 
-// ── API ──────────────────────────────────────────────────────────────────────
+// ── DARK MODE ────────────────────────────────────────────────────────────────
+function toggleDark() {
+  const isDark = document.body.classList.toggle('dark');
+  localStorage.setItem('smartmouse_dark', isDark ? '1' : '0');
+  document.getElementById('darkToggle').textContent = isDark ? '☀️' : '🌙';
+}
+(function initDark() {
+  const saved = localStorage.getItem('smartmouse_dark');
+  const prefersDark = saved === null && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  if (saved === '1' || prefersDark) {
+    document.body.classList.add('dark');
+  }
+  // Update button icon once DOM ready
+  document.addEventListener('DOMContentLoaded', function() {
+    const btn = document.getElementById('darkToggle');
+    if (btn) btn.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
+  });
+})();
+
 async function api(method, path, body, auth = true) {
   const headers = {'Content-Type': 'application/json'};
   if (auth && session?.token) headers['Authorization'] = 'Bearer ' + session.token;
@@ -721,7 +778,7 @@ function showResTab(tab) {
     document.getElementById('rescontent-' + t).style.display = t === tab ? 'block' : 'none';
   });
   if (tab === 'review') renderReview();
-  if (tab === 'board')  loadLeaderboard('all', 'rescontent-board');
+  if (tab === 'board')  loadLeaderboard('today', 'rescontent-board');
 }
 
 function renderReview() {
@@ -747,7 +804,7 @@ let currentLbPeriod = 'all';
 async function loadLeaderboard(period = 'all', containerId = 'lb-main') {
   currentLbPeriod = period;
   // Highlight active period btn (only on main leaderboard screen)
-  ['all','week','today'].forEach(p => {
+  ['all','month','today'].forEach(p => {
     const b = document.getElementById('lbp-' + p);
     if (b) b.style.borderColor = p === period ? 'var(--accent)' : '';
   });
@@ -758,7 +815,7 @@ async function loadLeaderboard(period = 'all', containerId = 'lb-main') {
   try {
     const qs = `period=${period}&limit=20${yl ? '&year_level=' + encodeURIComponent(yl) : ''}`;
     const data = await api('GET', `leaderboard?${qs}`, null, false);
-    renderLbTable(data.leaderboard, container);
+    renderLbTable(data.leaderboard, container, period);
   } catch(e) {
     container.innerHTML = `<div class="lb-table"><div class="lb-empty">⚠ Could not load leaderboard.<br><small>${e.message}</small></div></div>`;
   }
@@ -780,19 +837,23 @@ function switchLbTab(tab) {
   if (tab === 'insights') loadInsights();
 }
 
-function renderLbTable(rows, container) {
+function renderLbTable(rows, container, period) {
   const ranks = ['🥇','🥈','🥉'];
   const rCls  = ['gold','silver','bronze'];
   const myId  = session?.user?.id;
+  const showTop1 = period === 'all' || period === 'month';
   if (!rows.length) {
     container.innerHTML = '<div class="lb-table"><div class="lb-empty">No scores yet for this period.</div></div>';
     return;
   }
-  const col = 'grid-template-columns:44px 1fr 140px 70px 70px 70px';
+  const col = showTop1
+    ? 'grid-template-columns:44px 1fr 140px 60px 60px 60px 60px'
+    : 'grid-template-columns:44px 1fr 140px 70px 70px 70px';
   let html = '<div class="lb-table">';
   html += '<div class="lb-header" style="' + col + '">';
   html += '<div>Rank</div><div>Player</div><div>Level</div>';
   html += '<div style="text-align:center">Best</div>';
+  if (showTop1) html += '<div style="text-align:center" title="Times ranked #1 in daily rankings">👑 #1s</div>';
   html += '<div style="text-align:center">Streak</div>';
   html += '<div class="lb-games" style="text-align:center">Games</div>';
   html += '</div>';
@@ -807,6 +868,12 @@ function renderLbTable(rows, container) {
     html += '<div class="lb-name ' + meClass + '">' + esc(r.display_name || r.username) + (r.id === myId ? ' (you)' : '') + '</div>';
     html += '<div class="lb-yl"><span class="yl-badge" title="' + esc(fullYl) + '">' + esc(yl) + '</span></div>';
     html += '<div class="lb-score">' + r.best_score + '/10</div>';
+    if (showTop1) {
+      const crowns = r.top1_count > 0
+        ? '<span class="top1-badge">👑 ' + r.top1_count + '</span>'
+        : '<span style="color:var(--muted);font-size:.8rem">—</span>';
+      html += '<div style="text-align:center">' + crowns + '</div>';
+    }
     html += '<div class="lb-streak">🔥' + r.streak + '</div>';
     html += '<div class="lb-games">' + r.games + '</div>';
     html += '</div>';
@@ -819,7 +886,7 @@ function renderLbTable(rows, container) {
 async function loadInsights() {
   const el = document.getElementById('lb-insights-content');
   if (!el) return;
-  el.innerHTML = '<div style="text-align:center;padding:40px"><span class="spinner"></span> Loading insights…</div>';
+  el.innerHTML = '<div style="text-align:center;padding:40px"><span class="spinner"></span> Loading insights\u2026</div>';
   try {
     const data = await api('GET', 'subject-insights', null, false);
     renderInsights(data.insights, el);
@@ -834,29 +901,66 @@ function renderInsights(insights, el) {
     return;
   }
   const ylFullName = {
-    elementary: 'Elementary', junior_high: 'Junior High School',
-    senior_high: 'Senior High School', college: 'College',
+    elementary: 'Elementary', junior_high: 'Junior High',
+    senior_high: 'Senior High', college: 'College',
   };
-  const cards = insights.map(item => {
+  const BUBBLE_COLORS = [
+    ['rgba(26,198,204,.20)','#0a9ca1'],
+    ['rgba(96,165,250,.20)','#1d4ed8'],
+    ['rgba(167,139,250,.20)','#6d28d9'],
+    ['rgba(251,191,36,.20)','#b45309'],
+    ['rgba(52,211,153,.20)','#065f46'],
+    ['rgba(251,113,133,.20)','#9f1239'],
+    ['rgba(249,115,22,.20)','#c2410c'],
+    ['rgba(34,211,238,.20)','#0e7490'],
+  ];
+
+  // Build subject tabs
+  let tabsHtml = '<div class="ins-tabs">';
+  insights.forEach((item, idx) => {
+    tabsHtml += '<button class="ins-tab-btn' + (idx===0?' active':'') + '" onclick="switchInsTab(' + idx + ')">' + esc(item.subject) + '</button>';
+  });
+  tabsHtml += '</div>';
+
+  // Build bubble panels per subject
+  let panelsHtml = '';
+  insights.forEach((item, idx) => {
+    const maxScore = Math.max(...item.groups.map(g => g.avg_score), 0.1);
     const top = item.top_group;
     const topName = top ? (top.track_course || ylFullName[top.year_level] || top.year_level) : '\u2014';
-    const topScore = top ? top.avg_score.toFixed(1) : '0';
-    const bars = item.groups.slice(0, 6).map(g => {
+
+    const bubbles = item.groups.map((g, bi) => {
       const name = g.track_course || ylFullName[g.year_level] || g.year_level;
-      const pct  = Math.round((g.avg_score / 10) * 100);
-      return '<div class="insight-bar-wrap">' +
-        '<div class="insight-bar-label"><strong>' + esc(name) + '</strong>' +
-        '<span>' + g.avg_score.toFixed(1) + '/10 <span style="color:var(--border)">(' + g.player_count + ' player' + (g.player_count!==1?'s':'') + ')</span></span></div>' +
-        '<div class="insight-bar-track"><div class="insight-bar-fill" style="width:' + pct + '%"></div></div>' +
-        '</div>';
+      const shortName = name.length > 16 ? name.substring(0, 15) + '\u2026' : name;
+      // Size 72–150px based on relative avg_score
+      const size = Math.round(72 + (g.avg_score / maxScore) * 78);
+      const isTop = bi === 0;
+      const [bg, fg] = BUBBLE_COLORS[bi % BUBBLE_COLORS.length];
+      const crownHtml = isTop ? '<span class="ins-bubble-crown">\uD83C\uDFC6</span>' : '';
+      return '<div class="ins-bubble' + (isTop ? ' ins-bubble-top' : '') + '"'
+        + ' style="width:' + size + 'px;height:' + size + 'px;background:' + bg + ';border-color:' + fg + ';color:' + fg + ';"'
+        + ' title="' + esc(name) + ': avg ' + g.avg_score.toFixed(1) + '/10, ' + g.player_count + ' player' + (g.player_count!==1?'s':'') + '">'
+        + crownHtml
+        + '<span class="ins-bubble-score">' + g.avg_score.toFixed(1) + '</span>'
+        + '<span class="ins-bubble-name">' + esc(shortName) + '</span>'
+        + '<span class="ins-bubble-players">' + g.player_count + '\uD83D\uDC64</span>'
+        + '</div>';
     }).join('');
-    return '<div class="insight-card">' +
-      '<div class="insight-subject">' + esc(item.subject) + ' <span>Subject</span></div>' +
-      '<div class="insight-top-badge">\u{1F3C6} Best performers: ' + esc(topName) + ' \u2014 avg ' + topScore + '/10</div>' +
-      bars +
-      '</div>';
-  }).join('');
-  el.innerHTML = '<p style="color:var(--muted);font-size:.82rem;margin-bottom:18px">Based on leaderboard scores per subject. Updates every midnight PHT.</p>' + cards;
+
+    panelsHtml += '<div class="ins-panel' + (idx===0 ? '' : ' ins-panel-hidden') + '" id="ins-panel-' + idx + '">'
+      + '<div class="ins-champion">\uD83C\uDFC6 Top: <strong>' + esc(topName) + '</strong>'
+      + (top ? ' &mdash; avg ' + top.avg_score.toFixed(1) + '/10' : '') + '</div>'
+      + '<div class="ins-bubble-wrap">' + bubbles + '</div>'
+      + '<p class="ins-note">Bubble size reflects average score. Updates every midnight PHT.</p>'
+      + '</div>';
+  });
+
+  el.innerHTML = tabsHtml + panelsHtml;
+}
+
+function switchInsTab(idx) {
+  document.querySelectorAll('.ins-tab-btn').forEach(function(b, i) { b.classList.toggle('active', i === idx); });
+  document.querySelectorAll('.ins-panel').forEach(function(p, i) { p.classList.toggle('ins-panel-hidden', i !== idx); });
 }
 
 // ── PROFILE ───────────────────────────────────────────────────────────────────
