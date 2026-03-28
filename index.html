@@ -139,6 +139,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
 .lb-row:hover{background:var(--surface2)}
 .lb-rank{font-family:'DM Mono',monospace;font-weight:500}
 .lb-rank.gold{color:#c89000}.lb-rank.silver{color:#a8b8c8}.lb-rank.bronze{color:#c87840}
+body.dark .lb-rank.gold{color:#f0c040}body.dark .lb-rank.silver{color:#c8d8e8}body.dark .lb-rank.bronze{color:#e09060}
 .lb-name{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lb-me{color:var(--aqua-dark)!important;font-weight:700!important}
 .lb-score{font-family:'DM Mono',monospace;color:var(--aqua-dark);text-align:center}
@@ -292,6 +293,26 @@ body.dark .ins-champion strong{color:var(--aqua-dark)}
 .ins-bubble-name{font-size:.62rem;font-weight:600;text-align:center;line-height:1.2;margin-top:2px;opacity:.85}
 .ins-bubble-players{font-size:.6rem;opacity:.7;margin-top:2px}
 .ins-note{color:var(--muted);font-size:.75rem;text-align:center;margin-top:10px;padding:0 8px}
+/* ── WELCOME SCREEN ── */
+#screen-welcome{display:none;min-height:calc(100vh - 100px);align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:40px 0 60px}
+#screen-welcome.active{display:flex}
+.welcome-logo{font-family:'DM Serif Display',serif;font-size:2.2rem;letter-spacing:-.5px;margin-bottom:6px}
+.welcome-logo span{color:var(--aqua-dark)}
+.welcome-tagline{font-size:.95rem;color:var(--muted);margin-bottom:40px;max-width:320px}
+.welcome-badges{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:44px}
+.welcome-badge{display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:.78rem;font-weight:600;color:var(--text)}
+.welcome-actions{display:flex;flex-direction:column;gap:12px;width:100%;max-width:320px}
+.welcome-actions .btn{width:100%;font-size:1rem;padding:14px 24px}
+.welcome-divider{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.78rem;width:100%;max-width:320px}
+.welcome-divider::before,.welcome-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.welcome-already{background:none;border:1.5px solid var(--border);border-radius:10px;padding:13px 24px;font-family:'Instrument Sans',sans-serif;font-size:.9rem;font-weight:500;color:var(--muted);cursor:pointer;transition:all .18s;width:100%;max-width:320px}
+.welcome-already:hover{border-color:var(--accent);color:var(--text)}
+@keyframes floatIn{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+#screen-welcome.active .welcome-logo{animation:floatIn .5s ease both}
+#screen-welcome.active .welcome-tagline{animation:floatIn .5s .08s ease both}
+#screen-welcome.active .welcome-badges{animation:floatIn .5s .16s ease both}
+#screen-welcome.active .welcome-actions{animation:floatIn .5s .24s ease both}
+#screen-welcome.active .welcome-divider,#screen-welcome.active .welcome-already{animation:floatIn .5s .3s ease both}
 </style>
 </head>
 <body>
@@ -306,6 +327,22 @@ body.dark .ins-champion strong{color:var(--aqua-dark)}
       <div id="authArea"></div>
     </div>
   </header>
+
+  <!-- WELCOME (shown to guests on first visit) -->
+  <div id="screen-welcome" class="screen">
+    <div class="welcome-logo">Smart <span>Mouse</span></div>
+    <p class="welcome-tagline">Your daily academic challenge. 10 questions. Every day. Get smarter.</p>
+    <div class="welcome-badges">
+      <span class="welcome-badge">📚 10 Daily Questions</span>
+      <span class="welcome-badge">🏆 Global Rankings</span>
+      <span class="welcome-badge">🔥 Daily Streaks</span>
+    </div>
+    <div class="welcome-actions">
+      <button class="btn btn-primary" onclick="onWelcomeGetStarted()">Get Started</button>
+    </div>
+    <div class="welcome-divider" style="margin-top:16px">or</div>
+    <button class="welcome-already" onclick="onWelcomeLogin()">I already have an account</button>
+  </div>
 
   <!-- HOME -->
   <div id="screen-home" class="screen active">
@@ -560,6 +597,8 @@ async function doLogin() {
     localStorage.setItem('smartmouse_session', JSON.stringify(session));
     closeModal();
     renderAuthArea();
+    showScreen('home');
+    checkDailyStatus();
   } catch(e) {
     errEl.textContent = e.message;
   } finally {
@@ -595,6 +634,7 @@ async function doRegister() {
     localStorage.setItem('smartmouse_session', JSON.stringify(session));
     closeModal();
     renderAuthArea();
+    showScreen('home');
     checkDailyStatus();
   } catch(e) {
     errEl.textContent = e.message;
@@ -608,7 +648,7 @@ async function doLogout() {
   session = null;
   localStorage.removeItem('smartmouse_session');
   renderAuthArea();
-  showScreen('home');
+  showScreen('welcome');
 }
 
 // ── SCREENS ───────────────────────────────────────────────────────────────────
@@ -1186,7 +1226,7 @@ async function checkDailyStatus() {
     if (badge) {
       badge.textContent = "⚠️ Today's questions aren't ready yet — check back soon!";
       badge.style.display = 'inline-block';
-      badge.style.background = '#e67e22';
+      badge.style.background = 'var(--danger)';
     }
     // Disable start button until questions are available
     const startBtn = document.querySelector('[onclick="startQuiz()"]');
@@ -1251,7 +1291,13 @@ function lockStartButton(nextResetMs, score, total) {
 // ── INIT ──────────────────────────────────────────────────────────────────────
 (function init() {
   renderAuthArea();
-  checkDailyStatus(); // check if logged-in user already played today
+
+  // Show welcome screen for guests who have never logged in
+  if (!session) {
+    showScreen('welcome');
+  } else {
+    checkDailyStatus();
+  }
 
   // Floating dots bg
   const bg = document.getElementById('dotBg');
@@ -1267,6 +1313,14 @@ function lockStartButton(nextResetMs, score, total) {
   document.getElementById('li-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
   document.getElementById('reg-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doRegister(); });
 })();
+
+// ── WELCOME SCREEN HANDLERS ───────────────────────────────────────────────────
+function onWelcomeGetStarted() {
+  openModal('register');
+}
+function onWelcomeLogin() {
+  openModal('login');
+}
 </script>
 </body>
 </html>
