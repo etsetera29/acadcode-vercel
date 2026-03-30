@@ -12,10 +12,12 @@ export default async function handler(req, res) {
   const auth = await requireAuth(req, res);
   if (!auth) return;
 
-  const userId = auth.user_id;
-  const body   = getBody(req);
-  const score  = parseInt(body.score           ?? -1,  10);
-  const total  = parseInt(body.total_questions ?? 10, 10);
+  const userId           = auth.user_id;
+  const body             = getBody(req);
+  const score            = parseInt(body.score            ?? -1, 10);
+  const total            = parseInt(body.total_questions  ?? 10, 10);
+  const timeTakenSeconds = parseInt(body.time_taken_seconds ?? 0, 10);
+  const startedAt        = body.started_at ? new Date(body.started_at) : null;
 
   if (isNaN(score) || score < 0 || score > total) return err(res, 'Invalid score value.');
 
@@ -29,8 +31,8 @@ export default async function handler(req, res) {
   if (dup.length) return err(res, 'You have already submitted a score today. Come back tomorrow!', 409);
 
   await sql`
-    INSERT INTO scores (user_id, score, total_questions, submitted_at)
-    VALUES (${userId}, ${score}, ${total}, NOW())
+    INSERT INTO scores (user_id, score, total_questions, submitted_at, started_at, time_taken_seconds)
+    VALUES (${userId}, ${score}, ${total}, NOW(), ${startedAt}, ${timeTakenSeconds})
   `;
 
   const streak = await recalcStreak(userId);
