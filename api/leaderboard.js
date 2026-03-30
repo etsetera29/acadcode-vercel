@@ -28,18 +28,19 @@ export default async function handler(req, res) {
         SELECT u.id,
                COALESCE(u.display_name, u.username) AS display_name,
                u.year_level, u.track_course,
-               MAX(sc.score)          AS best_score,
-               COUNT(sc.id)           AS games_played,
+               MAX(sc.score)              AS best_score,
+               COUNT(sc.id)               AS games_played,
                u.streak,
-               MAX(sc.submitted_at)   AS last_played,
-               0                      AS top1_count
+               MAX(sc.submitted_at)       AS last_played,
+               0                          AS top1_count,
+               MIN(sc.time_taken_seconds) AS time_taken_seconds
         FROM   scores sc
         JOIN   users  u ON u.id = sc.user_id
         WHERE  (sc.submitted_at AT TIME ZONE 'Asia/Manila')::date
                = (NOW() AT TIME ZONE 'Asia/Manila')::date
           AND  u.year_level = ${yl_filter}
         GROUP  BY u.id, u.username, u.display_name, u.streak, u.year_level, u.track_course
-        ORDER  BY best_score DESC, u.streak DESC, games_played DESC
+        ORDER  BY best_score DESC, time_taken_seconds ASC, last_played ASC
         LIMIT  ${limit}
       `;
     } else {
@@ -47,17 +48,18 @@ export default async function handler(req, res) {
         SELECT u.id,
                COALESCE(u.display_name, u.username) AS display_name,
                u.year_level, u.track_course,
-               MAX(sc.score)          AS best_score,
-               COUNT(sc.id)           AS games_played,
+               MAX(sc.score)              AS best_score,
+               COUNT(sc.id)               AS games_played,
                u.streak,
-               MAX(sc.submitted_at)   AS last_played,
-               0                      AS top1_count
+               MAX(sc.submitted_at)       AS last_played,
+               0                          AS top1_count,
+               MIN(sc.time_taken_seconds) AS time_taken_seconds
         FROM   scores sc
         JOIN   users  u ON u.id = sc.user_id
         WHERE  (sc.submitted_at AT TIME ZONE 'Asia/Manila')::date
                = (NOW() AT TIME ZONE 'Asia/Manila')::date
         GROUP  BY u.id, u.username, u.display_name, u.streak, u.year_level, u.track_course
-        ORDER  BY best_score DESC, u.streak DESC, games_played DESC
+        ORDER  BY best_score DESC, time_taken_seconds ASC, last_played ASC
         LIMIT  ${limit}
       `;
     }
@@ -241,16 +243,17 @@ export default async function handler(req, res) {
   }
 
   const leaderboard = rows.map((row, i) => ({
-    rank:         i + 1,
-    id:           Number(row.id),
-    display_name: row.display_name,
-    year_level:   row.year_level ?? 'college',
-    track_course: row.track_course ?? null,
-    best_score:   Number(row.best_score),
-    games:        Number(row.games_played),
-    streak:       Number(row.streak),
-    last_played:  row.last_played,
-    top1_count:   Number(row.top1_count ?? 0),
+    rank:               i + 1,
+    id:                 Number(row.id),
+    display_name:       row.display_name,
+    year_level:         row.year_level ?? 'college',
+    track_course:       row.track_course ?? null,
+    best_score:         Number(row.best_score),
+    games:              Number(row.games_played),
+    streak:             Number(row.streak),
+    last_played:        row.last_played,
+    top1_count:         Number(row.top1_count ?? 0),
+    time_taken_seconds: row.time_taken_seconds != null ? Number(row.time_taken_seconds) : null,
   }));
 
   ok(res, { period, count: leaderboard.length, leaderboard });
