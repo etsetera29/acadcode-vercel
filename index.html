@@ -676,8 +676,20 @@ async function startQuiz() {
     }
     if (btn) { btn.disabled = false; btn.textContent = 'Start Quiz'; }
   }
-  quiz = {current:0, answers:Array(QUESTIONS.length).fill(null).map(()=>({selected:null,correct:false})), score:0, timer:null, timeLeft:30, answered:false};
+  quiz = {current:0, answers:Array(QUESTIONS.length).fill(null).map(()=>({selected:null,correct:false})), score:0, timer:null, timeLeft:30, answered:false, startedAt: Date.now()};
   showScreen('quiz');
+
+  // Tab-switch guard: auto-skip current question if user leaves the tab
+  function onVisibilityChange() {
+    if (document.hidden && !quiz.answered) {
+      skipQuestion();
+    }
+  }
+  // Remove any previous listener then add fresh one
+  document.removeEventListener('visibilitychange', quiz._visHandler);
+  quiz._visHandler = onVisibilityChange;
+  document.addEventListener('visibilitychange', quiz._visHandler);
+
   renderQ();
 }
 
@@ -769,6 +781,13 @@ function nextQuestion() {
 // ── RESULTS ───────────────────────────────────────────────────────────────────
 async function showResults() {
   clearInterval(quiz.timer);
+  // Remove tab-switch listener — quiz is over
+  if (quiz._visHandler) {
+    document.removeEventListener('visibilitychange', quiz._visHandler);
+    quiz._visHandler = null;
+  }
+  const finishedAt = Date.now();
+  const timeTakenSeconds = Math.round((finishedAt - quiz.startedAt) / 1000);
   const total = QUESTIONS.length;
   const pct = Math.round(quiz.score / total * 100);
   document.getElementById('scoreCircle').style.setProperty('--pct', pct);
@@ -788,7 +807,7 @@ async function showResults() {
     statusEl.style.color = 'var(--muted)';
     statusEl.textContent = 'Saving your score…';
     try {
-      const res = await api('POST', 'submit', {score: quiz.score, total_questions: total});
+      const res = await api('POST', 'submit', {score: quiz.score, total_questions: total, started_at: new Date(quiz.startedAt).toISOString(), time_taken_seconds: timeTakenSeconds});
       session.user.streak = res.streak;
       localStorage.setItem('smartmouse_session', JSON.stringify(session));
       document.getElementById('streakNum').textContent = '🔥 ' + res.streak;
