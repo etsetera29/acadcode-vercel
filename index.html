@@ -148,10 +148,20 @@ body.dark .streak-badge{color:var(--yellow)}
 .home-hero p{color:var(--muted);font-size:.89rem;max-width:400px;margin:0 auto 12px;line-height:1.6;font-weight:600}
 #subjectBadge{margin:0 auto 16px;padding:.35rem 1.1rem;background:var(--primary);color:#fff;border-radius:999px;font-size:.8rem;font-weight:800;max-width:fit-content;letter-spacing:.01em}
 .info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
-.info-card{background:var(--surface2);border:2px solid var(--border);border-radius:16px;padding:13px 10px;text-align:center;transition:transform .18s}
+.info-card{background:var(--surface2);border:2px solid var(--border);border-radius:16px;padding:13px 10px;text-align:center;transition:transform .18s;position:relative;overflow:hidden}
 .info-card:hover{transform:translateY(-2px)}
 .info-card .ic-num{font-family:'DM Serif Display',serif;font-size:1.8rem;color:var(--primary);display:block;line-height:1;margin-bottom:4px}
 .info-card .ic-label{font-size:.66rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:800}
+.info-card .ic-name{font-size:.72rem;font-weight:800;color:var(--text);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;margin-bottom:2px}
+.info-card .ic-score{font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--primary);display:block;line-height:1.1;margin-bottom:2px}
+.info-card .ic-sub{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:800}
+/* Flaming all-time #1 card */
+.info-card.flame-card{border-color:#ff6b00;background:linear-gradient(160deg,rgba(255,107,0,.10) 0%,var(--surface2) 60%)}
+.info-card.flame-card .ic-score{color:#ff6b00}
+@keyframes flicker{0%,100%{text-shadow:0 0 6px #ff6b00,0 0 12px #ff9500;transform:scale(1)}50%{text-shadow:0 0 10px #ff3d00,0 0 20px #ff9500,0 0 30px #ffcf00;transform:scale(1.12)}}
+.flame-emoji{display:inline-block;animation:flicker 1.2s ease-in-out infinite;font-size:1.1rem}
+.info-card-loading .ic-score,.info-card-loading .ic-name{background:var(--border);border-radius:6px;color:transparent;animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
 .home-actions{display:flex;gap:9px;justify-content:center;flex-wrap:wrap}
 
 /* QUIZ */
@@ -338,6 +348,9 @@ body{height:100%;height:100dvh}
   .info-card{padding:8px 4px;border-radius:10px}
   .info-card .ic-num{font-size:1.35rem}
   .info-card .ic-label{font-size:.6rem}
+  .info-card .ic-score{font-size:1.1rem}
+  .info-card .ic-name{font-size:.62rem}
+  .info-card .ic-sub{font-size:.55rem}
   .home-actions .btn{flex:1;min-width:0;padding:8px 6px;font-size:.78rem}
   .profile-card{padding:9px 10px;margin-bottom:6px;gap:9px}
   .profile-avatar{width:40px;height:40px;font-size:1.4rem}
@@ -388,6 +401,8 @@ body{height:100%;height:100dvh}
   .info-grid{gap:7px;margin-bottom:14px}
   .info-card{padding:10px 6px;border-radius:12px}
   .info-card .ic-num{font-size:1.55rem}
+  .info-card .ic-score{font-size:1.25rem}
+  .info-card .ic-name{font-size:.67rem}
   .home-actions .btn{flex:1;min-width:0;padding:9px 8px;font-size:.83rem}
   .profile-card{padding:10px 12px;margin-bottom:8px;gap:10px}
   .profile-avatar{width:46px;height:46px;font-size:1.6rem}
@@ -454,6 +469,9 @@ body{height:100%;height:100dvh}
   .info-grid{margin-bottom:10px;gap:6px}
   .info-card{padding:7px 5px}
   .info-card .ic-num{font-size:1.3rem}
+  .info-card .ic-score{font-size:1.05rem}
+  .info-card .ic-name{font-size:.6rem}
+  .info-card .ic-sub{font-size:.52rem}
   #subjectBadge{margin-bottom:8px;padding:.25rem .8rem;font-size:.74rem}
   .home-actions{gap:7px}
   .home-actions .btn{padding:8px 12px;font-size:.83rem}
@@ -554,9 +572,21 @@ body{height:100%;height:100dvh}
         <p>Sharpen your academic edge with daily challenges across Computer Science, Math, Logic, and more.</p>
         <div id="subjectBadge" style="display:none"></div>
         <div class="info-grid">
-          <div class="info-card"><span class="ic-num">10</span><span class="ic-label">Daily Qs</span></div>
-          <div class="info-card"><span class="ic-num">30s</span><span class="ic-label">Per Question</span></div>
-          <div class="info-card"><span class="ic-num">🏆</span><span class="ic-label">Rankings</span></div>
+          <div class="info-card info-card-loading" id="homeCardYesterday">
+            <span class="ic-score">—</span>
+            <span class="ic-name">Loading…</span>
+            <span class="ic-sub">🏅 Top Today</span>
+          </div>
+          <div class="info-card info-card-loading" id="homeCardMonthly">
+            <span class="ic-score">—</span>
+            <span class="ic-name">Loading…</span>
+            <span class="ic-sub">👑 Top Monthly</span>
+          </div>
+          <div class="info-card flame-card info-card-loading" id="homeCardAllTime">
+            <span class="ic-score"><span class="flame-emoji">🔥</span></span>
+            <span class="ic-name">Loading…</span>
+            <span class="ic-sub">All-Time #1</span>
+          </div>
         </div>
         <div class="home-actions">
           <button class="btn btn-primary" onclick="startQuiz()">▶ Start Today's Set</button>
@@ -841,6 +871,54 @@ function showScreen(id) {
   document.getElementById('screen-' + id).classList.add('active');
   if (id === 'leaderboard') loadLeaderboard('all');
   if (id === 'profile') loadProfile();
+  if (id === 'home') loadHomeStatCards();
+}
+
+async function loadHomeStatCards() {
+  function setCard(cardId, score, name) {
+    const card = document.getElementById(cardId);
+    if (!card) return;
+    card.classList.remove('info-card-loading');
+    const scoreEl = card.querySelector('.ic-score');
+    const nameEl  = card.querySelector('.ic-name');
+    if (scoreEl) {
+      if (cardId === 'homeCardAllTime') {
+        scoreEl.innerHTML = '<span class="flame-emoji">🔥</span> ' + (score || '—');
+      } else {
+        scoreEl.textContent = score || '—';
+      }
+    }
+    if (nameEl) nameEl.textContent = name || 'No data yet';
+  }
+
+  const [todayRes, monthRes, allRes] = await Promise.allSettled([
+    api('GET', 'leaderboard?period=today&limit=1', null, false),
+    api('GET', 'leaderboard?period=month&limit=1', null, false),
+    api('GET', 'leaderboard?period=all&limit=1',  null, false)
+  ]);
+
+  if (todayRes.status === 'fulfilled' && todayRes.value.leaderboard?.[0]) {
+    const r = todayRes.value.leaderboard[0];
+    setCard('homeCardYesterday', r.best_score + '/10', r.display_name || r.username);
+  } else {
+    setCard('homeCardYesterday', null, 'No scores yet');
+  }
+
+  if (monthRes.status === 'fulfilled' && monthRes.value.leaderboard?.[0]) {
+    const r = monthRes.value.leaderboard[0];
+    const detail = r.top1_count > 0 ? r.top1_count + ' 👑' : r.best_score + '/10';
+    setCard('homeCardMonthly', detail, r.display_name || r.username);
+  } else {
+    setCard('homeCardMonthly', null, 'No scores yet');
+  }
+
+  if (allRes.status === 'fulfilled' && allRes.value.leaderboard?.[0]) {
+    const r = allRes.value.leaderboard[0];
+    const detail = r.top1_count > 0 ? r.top1_count + ' 👑' : r.best_score + '/10';
+    setCard('homeCardAllTime', detail, r.display_name || r.username);
+  } else {
+    setCard('homeCardAllTime', null, 'No scores yet');
+  }
 }
 
 async function startQuiz() {
