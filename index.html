@@ -120,6 +120,26 @@ body.dark .streak-badge{color:var(--yellow)}
 .results-back-bar{display:flex;justify-content:flex-start;padding:10px 14px 0}
 .results-back-btn{align-self:flex-start}
 
+/* FLASHCARD OVERLAY */
+#flashcard-overlay{position:fixed;inset:0;z-index:1000;display:flex;align-items:flex-end;justify-content:center}
+.fc-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(2px)}
+.fc-sheet{position:relative;width:100%;max-width:520px;background:var(--surface);border-radius:22px 22px 0 0;padding:0 0 env(safe-area-inset-bottom,12px);box-shadow:0 -8px 40px rgba(0,0,0,.25);animation:fcSlideUp .28s cubic-bezier(.34,1.2,.64,1) both;max-height:88vh;display:flex;flex-direction:column}
+@keyframes fcSlideUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
+.fc-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 10px;border-bottom:1.5px solid var(--border);flex-shrink:0}
+.fc-counter{font-family:'DM Mono',monospace;font-size:.78rem;color:var(--muted);font-weight:700;background:var(--surface2);padding:3px 10px;border-radius:20px;border:1.5px solid var(--border)}
+.fc-title{font-size:.85rem;font-weight:800;color:var(--text)}
+.fc-close{background:none;border:none;font-size:1.1rem;color:var(--muted);cursor:pointer;padding:4px 8px;border-radius:8px;transition:color .15s}.fc-close:hover{color:var(--text)}
+.fc-body{padding:18px 18px 10px;overflow-y:auto;flex:1}
+.fc-category{font-size:.72rem;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
+.fc-question{font-size:1rem;font-weight:700;line-height:1.5;margin-bottom:16px;color:var(--text)}
+.fc-answer-label{font-size:.72rem;font-weight:800;color:var(--green-dark);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px}
+.fc-answer{background:rgba(88,204,2,.09);border:1.5px solid rgba(88,204,2,.3);border-radius:10px;padding:9px 13px;font-size:.9rem;font-weight:700;color:var(--text);margin-bottom:14px}
+.fc-explanation{background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:10px 13px;font-size:.84rem;line-height:1.6;color:var(--muted);font-weight:600}
+.fc-nav{display:flex;gap:8px;padding:10px 18px 16px;flex-shrink:0;border-top:1.5px solid var(--border)}
+.fc-nav .btn{flex:1}
+.fc-history-row{cursor:pointer;transition:border-color .15s,background .15s}
+.fc-history-row:hover{border-color:var(--primary)!important;background:rgba(108,71,232,.04)}
+
 /* HOME */
 .home-inner{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:20px 24px;text-align:center}
 .home-hero{width:100%;max-width:540px}
@@ -439,14 +459,6 @@ body.dark .top1-badge{color:var(--yellow);background:rgba(255,208,0,.12);border-
         <div class="save-status" id="saveStatus"></div>
       </div>
     </div>
-    <div class="tabs">
-      <button class="tab-btn active" id="restab-review" onclick="showResTab('review')">Answer Review</button>
-      <button class="tab-btn" id="restab-board" onclick="showResTab('board')">Leaderboard</button>
-    </div>
-    <div class="screen-body" style="padding-top:13px">
-      <div id="rescontent-review"></div>
-      <div id="rescontent-board" style="display:none"></div>
-    </div>
   </div>
 
   <!-- LEADERBOARD -->
@@ -496,6 +508,23 @@ body.dark .top1-badge{color:var(--yellow);background:rgba(255,208,0,.12);border-
     </div>
     <div class="screen-body" style="padding-top:4px">
       <div id="profile-content"></div>
+    </div>
+  </div>
+</div>
+
+<!-- FLASHCARD OVERLAY -->
+<div id="flashcard-overlay" style="display:none">
+  <div class="fc-backdrop" onclick="closeFlashcards()"></div>
+  <div class="fc-sheet">
+    <div class="fc-header">
+      <span class="fc-counter" id="fc-counter">1 / 10</span>
+      <span class="fc-title">Last Session Review</span>
+      <button class="fc-close" onclick="closeFlashcards()">✕</button>
+    </div>
+    <div class="fc-body" id="fc-body"></div>
+    <div class="fc-nav">
+      <button class="btn btn-ghost btn-sm" id="fc-prev" onclick="fcNav(-1)">← Prev</button>
+      <button class="btn btn-primary btn-sm" id="fc-next" onclick="fcNav(1)">Next →</button>
     </div>
   </div>
 </div>
@@ -789,29 +818,15 @@ async function showResults() {
     statusEl.style.color = 'var(--muted)';
     statusEl.innerHTML = '<a href="#" onclick="openModal(\'login\');return false" style="color:var(--primary)">Sign in</a> to save your score globally.';
   }
-  showResTab('review'); showScreen('results');
+  showScreen('results');
+  // Save last quiz for profile review
+  localStorage.setItem('smartmouse_last_quiz', JSON.stringify({
+    questions: QUESTIONS,
+    answers: quiz.answers,
+    date: new Date().toISOString()
+  }));
 }
 
-function showResTab(tab) {
-  ['review','board'].forEach(t => {
-    document.getElementById('restab-' + t).classList.toggle('active', t === tab);
-    document.getElementById('rescontent-' + t).style.display = t === tab ? 'block' : 'none';
-  });
-  if (tab === 'review') renderReview();
-  if (tab === 'board')  loadLeaderboard('today', 'rescontent-board');
-}
-
-function renderReview() {
-  const letters = ['A','B','C','D'];
-  document.getElementById('rescontent-review').innerHTML = QUESTIONS.map((q, i) => {
-    const a = quiz.answers[i];
-    let cls = 'badge-skip', txt = 'Skipped';
-    if (a.selected !== null) { cls = a.correct ? 'badge-correct' : 'badge-wrong'; txt = a.correct ? '✓ Correct' : '✗ Wrong'; }
-    const your = a.selected !== null ? '<strong>' + letters[a.selected] + '.</strong> ' + q.options[a.selected] : '—';
-    const corr = '<strong>' + letters[q.answer] + '.</strong> ' + q.options[q.answer];
-    return '<div class="review-item"><div class="ri-meta"><span class="badge ' + cls + '">' + txt + '</span><span>' + q.category + '</span></div><div class="ri-q">' + q.text + '</div><div class="ri-ans">Your answer: <span>' + your + '</span></div>' + (!a.correct ? '<div class="ri-ans">Correct: <span style="color:var(--green-dark)">' + corr + '</span></div>' : '') + '</div>';
-  }).join('');
-}
 
 let currentLbPeriod = 'all';
 async function loadLeaderboard(period = 'all', containerId = 'lb-main') {
@@ -906,7 +921,15 @@ async function loadProfile() {
   el.innerHTML = '<div style="text-align:center;padding:40px"><span class="spinner"></span></div>';
   try {
     const data = await api('GET', 'me'); const u = data.user;
-    el.innerHTML = '<div class="profile-card"><div class="profile-avatar">' + (u.flag||'🏳️') + '</div><div class="profile-display-name">' + esc(u.display_name||u.username) + '</div><div class="profile-username">@' + esc(u.username) + '</div><div class="profile-email">' + esc(u.email) + '</div><div style="margin-bottom:12px"><span class="yl-badge" style="font-size:.82rem;padding:4px 12px" title="' + esc(u.track_course||u.year_level||'') + '">' + esc(ylFullLabel(u.year_level, u.track_course)) + '</span></div><div class="name-edit-row"><input id="name-edit-input" type="text" value="' + esc(u.display_name||u.username) + '" maxlength="32" placeholder="Display name"/><button class="btn btn-ghost btn-xs" onclick="saveDisplayName()">Save</button></div><div class="name-edit-status" id="name-edit-status"></div><div class="stats-row"><div class="stat-box"><span class="sb-val" style="color:var(--yellow)">🔥' + u.streak + '</span><span class="sb-key">Streak</span></div><div class="stat-box"><span class="sb-val" style="color:var(--primary)">' + u.best + '/10</span><span class="sb-key">Best Score</span></div><div class="stat-box"><span class="sb-val">' + u.games + '</span><span class="sb-key">Games</span></div><div class="stat-box"><span class="sb-val">' + u.avg + '</span><span class="sb-key">Avg Score</span></div></div></div><div class="section-title" style="font-size:1.1rem;margin-bottom:12px">Recent Games</div>' + (u.history.length ? u.history.map(h => '<div class="review-item" style="display:flex;align-items:center;justify-content:space-between"><span style="color:var(--muted);font-size:.82rem">' + new Date(h.submitted_at).toLocaleDateString() + '</span><span style="font-family:\'DM Mono\',monospace;color:var(--primary);font-weight:700">' + h.score + '/' + h.total_questions + '</span></div>').join('') : '<p style="color:var(--muted);font-size:.9rem;font-weight:600">No games played yet.</p>') + '<div style="margin-top:18px;text-align:center"><button class="btn btn-danger btn-sm" onclick="doLogout()">Sign Out</button></div>';
+    const lastQuiz = localStorage.getItem('smartmouse_last_quiz');
+    const historyHTML = u.history.length
+      ? u.history.map((h, idx) => {
+          const dateStr = new Date(h.submitted_at).toLocaleDateString();
+          const isLast = idx === 0 && lastQuiz;
+          return '<div class="review-item fc-history-row" style="display:flex;align-items:center;justify-content:space-between;' + (isLast ? '' : 'opacity:.7') + '"' + (isLast ? ' onclick="openFlashcards()" title="Tap to review this session"' : '') + '><span style="color:var(--muted);font-size:.82rem">' + dateStr + (isLast ? ' <span style="color:var(--primary);font-size:.72rem;font-weight:800">● REVIEW</span>' : '') + '</span><span style="font-family:\'DM Mono\',monospace;color:var(--primary);font-weight:700">' + h.score + '/' + h.total_questions + '</span></div>';
+        }).join('')
+      : '<p style="color:var(--muted);font-size:.9rem;font-weight:600">No games played yet.</p>';
+    el.innerHTML = '<div class="profile-card"><div class="profile-avatar">' + (u.flag||'🏳️') + '</div><div class="profile-display-name">' + esc(u.display_name||u.username) + '</div><div class="profile-username">@' + esc(u.username) + '</div><div class="profile-email">' + esc(u.email) + '</div><div style="margin-bottom:12px"><span class="yl-badge" style="font-size:.82rem;padding:4px 12px" title="' + esc(u.track_course||u.year_level||'') + '">' + esc(ylFullLabel(u.year_level, u.track_course)) + '</span></div><div class="name-edit-row"><input id="name-edit-input" type="text" value="' + esc(u.display_name||u.username) + '" maxlength="32" placeholder="Display name"/><button class="btn btn-ghost btn-xs" onclick="saveDisplayName()">Save</button></div><div class="name-edit-status" id="name-edit-status"></div><div class="stats-row"><div class="stat-box"><span class="sb-val" style="color:var(--yellow)">🔥' + u.streak + '</span><span class="sb-key">Streak</span></div><div class="stat-box"><span class="sb-val" style="color:var(--primary)">' + u.best + '/10</span><span class="sb-key">Best Score</span></div><div class="stat-box"><span class="sb-val">' + u.games + '</span><span class="sb-key">Games</span></div><div class="stat-box"><span class="sb-val">' + u.avg + '</span><span class="sb-key">Avg Score</span></div></div></div><div class="section-title" style="font-size:1.1rem;margin-bottom:12px">Recent Games</div>' + historyHTML + '<div style="margin-top:18px;text-align:center"><button class="btn btn-danger btn-sm" onclick="doLogout()">Sign Out</button></div>';
   } catch(e) { el.innerHTML = '<p style="color:var(--danger)">' + e.message + '</p>'; }
 }
 
@@ -1020,6 +1043,56 @@ function lockStartButton(nextResetMs, score, total) {
 
 function onWelcomeGetStarted() { openModal('register'); }
 function onWelcomeLogin() { openModal('login'); }
+
+// ── FLASHCARD REVIEW ─────────────────────────────────────────────
+let fcData = [], fcIdx = 0;
+
+function openFlashcards() {
+  const raw = localStorage.getItem('smartmouse_last_quiz');
+  if (!raw) return;
+  try {
+    const saved = JSON.parse(raw);
+    fcData = saved.questions.map((q, i) => ({ q, a: saved.answers[i] }));
+    fcIdx = 0;
+    document.getElementById('flashcard-overlay').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    fcRender();
+  } catch(e) { console.error(e); }
+}
+
+function closeFlashcards() {
+  document.getElementById('flashcard-overlay').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function fcNav(dir) {
+  fcIdx = Math.max(0, Math.min(fcData.length - 1, fcIdx + dir));
+  fcRender();
+}
+
+function fcRender() {
+  const letters = ['A','B','C','D'];
+  const total = fcData.length;
+  const { q, a } = fcData[fcIdx];
+  const correctOption = q.options[q.answer];
+
+  document.getElementById('fc-counter').textContent = (fcIdx + 1) + ' / ' + total;
+  document.getElementById('fc-prev').disabled = fcIdx === 0;
+  document.getElementById('fc-next').disabled = fcIdx === total - 1;
+  document.getElementById('fc-next').textContent = fcIdx === total - 1 ? 'Done ✓' : 'Next →';
+  if (fcIdx === total - 1) {
+    document.getElementById('fc-next').onclick = closeFlashcards;
+  } else {
+    document.getElementById('fc-next').onclick = function() { fcNav(1); };
+  }
+
+  document.getElementById('fc-body').innerHTML =
+    '<div class="fc-category">' + esc(q.category) + '</div>' +
+    '<div class="fc-question">' + esc(q.text) + '</div>' +
+    '<div class="fc-answer-label">✓ Correct Answer</div>' +
+    '<div class="fc-answer"><strong>' + letters[q.answer] + '.</strong> ' + esc(correctOption) + '</div>' +
+    (q.explanation ? '<div class="fc-explanation">' + esc(q.explanation) + '</div>' : '');
+}
 </script>
 </body>
 </html>
