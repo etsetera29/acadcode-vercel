@@ -921,12 +921,12 @@ async function loadProfile() {
   el.innerHTML = '<div style="text-align:center;padding:40px"><span class="spinner"></span></div>';
   try {
     const data = await api('GET', 'me'); const u = data.user;
-    const lastQuiz = localStorage.getItem('smartmouse_last_quiz');
     const historyHTML = u.history.length
       ? u.history.map((h, idx) => {
           const dateStr = new Date(h.submitted_at).toLocaleDateString();
-          const isLast = idx === 0 && lastQuiz;
-          return '<div class="review-item fc-history-row" style="display:flex;align-items:center;justify-content:space-between;' + (isLast ? '' : 'opacity:.7') + '"' + (isLast ? ' onclick="openFlashcards()" title="Tap to review this session"' : '') + '><span style="color:var(--muted);font-size:.82rem">' + dateStr + (isLast ? ' <span style="color:var(--primary);font-size:.72rem;font-weight:800">● REVIEW</span>' : '') + '</span><span style="font-family:\'DM Mono\',monospace;color:var(--primary);font-weight:700">' + h.score + '/' + h.total_questions + '</span></div>';
+          // Extract YYYY-MM-DD from submitted_at for API lookup
+          const isoDate = h.submitted_at.slice(0, 10);
+          return '<div class="review-item fc-history-row" style="display:flex;align-items:center;justify-content:space-between" onclick="openFlashcardsByDate(\'' + isoDate + '\')" title="Tap to review this session"><span style="color:var(--muted);font-size:.82rem">' + dateStr + ' <span style="color:var(--primary);font-size:.72rem;font-weight:800">● REVIEW</span></span><span style="font-family:\'DM Mono\',monospace;color:var(--primary);font-weight:700">' + h.score + '/' + h.total_questions + '</span></div>';
         }).join('')
       : '<p style="color:var(--muted);font-size:.9rem;font-weight:600">No games played yet.</p>';
     el.innerHTML = '<div class="profile-card"><div class="profile-avatar">' + (u.flag||'🏳️') + '</div><div class="profile-display-name">' + esc(u.display_name||u.username) + '</div><div class="profile-username">@' + esc(u.username) + '</div><div class="profile-email">' + esc(u.email) + '</div><div style="margin-bottom:12px"><span class="yl-badge" style="font-size:.82rem;padding:4px 12px" title="' + esc(u.track_course||u.year_level||'') + '">' + esc(ylFullLabel(u.year_level, u.track_course)) + '</span></div><div class="name-edit-row"><input id="name-edit-input" type="text" value="' + esc(u.display_name||u.username) + '" maxlength="32" placeholder="Display name"/><button class="btn btn-ghost btn-xs" onclick="saveDisplayName()">Save</button></div><div class="name-edit-status" id="name-edit-status"></div><div class="stats-row"><div class="stat-box"><span class="sb-val" style="color:var(--yellow)">🔥' + u.streak + '</span><span class="sb-key">Streak</span></div><div class="stat-box"><span class="sb-val" style="color:var(--primary)">' + u.best + '/10</span><span class="sb-key">Best Score</span></div><div class="stat-box"><span class="sb-val">' + u.games + '</span><span class="sb-key">Games</span></div><div class="stat-box"><span class="sb-val">' + u.avg + '</span><span class="sb-key">Avg Score</span></div></div></div><div class="section-title" style="font-size:1.1rem;margin-bottom:12px">Recent Games</div>' + historyHTML + '<div style="margin-top:18px;text-align:center"><button class="btn btn-danger btn-sm" onclick="doLogout()">Sign Out</button></div>';
@@ -1047,17 +1047,24 @@ function onWelcomeLogin() { openModal('login'); }
 // ── FLASHCARD REVIEW ─────────────────────────────────────────────
 let fcData = [], fcIdx = 0;
 
-function openFlashcards() {
-  const raw = localStorage.getItem('smartmouse_last_quiz');
-  if (!raw) return;
+async function openFlashcardsByDate(isoDate) {
+  const overlay = document.getElementById('flashcard-overlay');
+  const body = document.getElementById('fc-body');
+  overlay.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  body.innerHTML = '<div style="text-align:center;padding:40px"><span class="spinner"></span></div>';
+  document.getElementById('fc-counter').textContent = '…';
+  document.getElementById('fc-prev').disabled = true;
+  document.getElementById('fc-next').disabled = true;
+
   try {
-    const saved = JSON.parse(raw);
-    fcData = saved.questions.map((q, i) => ({ q, a: saved.answers[i] }));
+    const data = await api('GET', 'questions?date=' + isoDate, null, false);
+    fcData = data.questions.map(q => ({ q }));
     fcIdx = 0;
-    document.getElementById('flashcard-overlay').style.display = 'flex';
-    document.body.style.overflow = 'hidden';
     fcRender();
-  } catch(e) { console.error(e); }
+  } catch(e) {
+    body.innerHTML = '<p style="color:var(--red);padding:20px;text-align:center">Could not load questions for this date.</p>';
+  }
 }
 
 function closeFlashcards() {
@@ -1073,18 +1080,14 @@ function fcNav(dir) {
 function fcRender() {
   const letters = ['A','B','C','D'];
   const total = fcData.length;
-  const { q, a } = fcData[fcIdx];
+  const { q } = fcData[fcIdx];
   const correctOption = q.options[q.answer];
 
   document.getElementById('fc-counter').textContent = (fcIdx + 1) + ' / ' + total;
   document.getElementById('fc-prev').disabled = fcIdx === 0;
-  document.getElementById('fc-next').disabled = fcIdx === total - 1;
+  document.getElementById('fc-next').disabled = false;
   document.getElementById('fc-next').textContent = fcIdx === total - 1 ? 'Done ✓' : 'Next →';
-  if (fcIdx === total - 1) {
-    document.getElementById('fc-next').onclick = closeFlashcards;
-  } else {
-    document.getElementById('fc-next').onclick = function() { fcNav(1); };
-  }
+  document.getElementById('fc-next').onclick = fcIdx === total - 1 ? closeFlashcards : function() { fcNav(1); };
 
   document.getElementById('fc-body').innerHTML =
     '<div class="fc-category">' + esc(q.category) + '</div>' +
