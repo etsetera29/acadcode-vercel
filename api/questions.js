@@ -20,14 +20,17 @@ export default async function handler(req, res) {
   if (handleOptions(req, res)) return;
   if (!requireMethod(req, res, 'GET')) return;
 
-  // Today in PHT (UTC+8)
-  const phtOffsetMs = 8 * 60 * 60 * 1000;
-  const nowPhtMs    = Date.now() + phtOffsetMs;
-  const phtDate     = new Date(nowPhtMs);
-  const year        = phtDate.getUTCFullYear();
-  const month       = String(phtDate.getUTCMonth() + 1).padStart(2, '0');
-  const day         = String(phtDate.getUTCDate()).padStart(2, '0');
-  const dateStr     = `${year}-${month}-${day}`;
+  // Use provided ?date=YYYY-MM-DD param, or fall back to today in PHT (UTC+8)
+  let dateStr = typeof req.query?.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(req.query.date)
+    ? req.query.date
+    : (() => {
+        const phtOffsetMs = 8 * 60 * 60 * 1000;
+        const phtDate     = new Date(Date.now() + phtOffsetMs);
+        const year        = phtDate.getUTCFullYear();
+        const month       = String(phtDate.getUTCMonth() + 1).padStart(2, '0');
+        const day         = String(phtDate.getUTCDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      })();
 
   const rows = await sql`
     SELECT category, text, code, options, answer, explanation
