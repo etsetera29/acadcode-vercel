@@ -1029,7 +1029,7 @@ function lockStartButton(nextResetMs, score, total) {
   renderAuthArea();
   showScreen('splash');
   setTimeout(function() {
-    if (!session) { showScreen('welcome'); } else { checkDailyStatus(); }
+    if (!session) { showScreen('welcome'); } else { showScreen('home'); checkDailyStatus(); }
   }, 1600);
   const bg = document.getElementById('dotBg');
   for (let i=0;i<12;i++) {
