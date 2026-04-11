@@ -84,23 +84,27 @@ header{display:flex;align-items:center;justify-content:space-between;padding:8px
 @keyframes splashFade{from{opacity:0}to{opacity:1}}
 @keyframes splashLoad{from{width:0%}to{width:100%}}
 /* WELCOME */
-#screen-welcome.active{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px 24px}
-.welcome-catchphrase{margin-bottom:18px;max-width:310px}
-.welcome-catchphrase h1{font-family:'DM Serif Display',serif;font-size:clamp(1.7rem,6vw,2.4rem);line-height:1.18;letter-spacing:-.5px;margin:0}
+#screen-welcome.active{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:28px 28px;gap:0}
+.welcome-mark{font-size:2.6rem;margin-bottom:16px;animation:floatIn .35s ease both}
+.welcome-catchphrase{margin-bottom:12px;max-width:300px}
+.welcome-catchphrase h1{font-family:'DM Serif Display',serif;font-size:clamp(1.65rem,5.5vw,2.2rem);line-height:1.2;letter-spacing:-.4px;margin:0;color:var(--text)}
 .welcome-catchphrase h1 em{font-style:italic;color:var(--primary)}
-.welcome-badges{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;margin-bottom:18px}
-.welcome-badge{display:flex;align-items:center;gap:6px;background:var(--surface2);border:2px solid var(--border);border-radius:20px;padding:5px 13px;font-size:.75rem;font-weight:700;color:var(--text)}
-.welcome-actions{display:flex;flex-direction:column;gap:9px;width:100%;max-width:290px}
-.welcome-actions .btn{width:100%;padding:13px 24px;font-size:1rem}
-.welcome-divider{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.76rem;width:100%;max-width:290px;margin:2px 0}
+.welcome-sub{font-size:.83rem;color:var(--muted);font-weight:600;margin-bottom:28px;line-height:1.5;max-width:260px}
+.welcome-badges{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:24px}
+.welcome-badge{display:flex;align-items:center;gap:5px;background:var(--surface2);border:1.5px solid var(--border);border-radius:20px;padding:4px 11px;font-size:.72rem;font-weight:700;color:var(--muted)}
+.welcome-actions{display:flex;flex-direction:column;gap:8px;width:100%;max-width:270px}
+.welcome-actions .btn{width:100%;padding:13px 24px;font-size:.95rem}
+.welcome-divider{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.73rem;width:100%;max-width:270px;margin:4px 0}
 .welcome-divider::before,.welcome-divider::after{content:'';flex:1;height:1px;background:var(--border)}
-.welcome-already{background:none;border:2px solid var(--border);border-radius:12px;padding:11px 24px;font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:700;color:var(--muted);cursor:pointer;transition:all .18s;width:100%;max-width:290px}
-.welcome-already:hover{border-color:var(--primary);color:var(--primary)}
-@keyframes floatIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-#screen-welcome.active .welcome-catchphrase{animation:floatIn .4s ease both}
-#screen-welcome.active .welcome-badges{animation:floatIn .4s .1s ease both}
-#screen-welcome.active .welcome-actions{animation:floatIn .4s .18s ease both}
-#screen-welcome.active .welcome-divider,#screen-welcome.active .welcome-already{animation:floatIn .4s .24s ease both}
+.welcome-already{background:none;border:none;font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:700;color:var(--muted);cursor:pointer;transition:color .15s;padding:4px 0;width:100%;max-width:270px}
+.welcome-already:hover{color:var(--primary)}
+@keyframes floatIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+#screen-welcome.active .welcome-mark{animation:floatIn .3s ease both}
+#screen-welcome.active .welcome-catchphrase{animation:floatIn .35s .05s ease both}
+#screen-welcome.active .welcome-sub{animation:floatIn .35s .1s ease both}
+#screen-welcome.active .welcome-badges{animation:floatIn .35s .15s ease both}
+#screen-welcome.active .welcome-actions{animation:floatIn .35s .2s ease both}
+#screen-welcome.active .welcome-divider,#screen-welcome.active .welcome-already{animation:floatIn .35s .25s ease both}
 /* RESULTS BACK */
 .results-back-bar{display:flex;justify-content:flex-start;padding:8px 14px 0}
 .results-back-btn{align-self:flex-start}
@@ -126,12 +130,13 @@ header{display:flex;align-items:center;justify-content:space-between;padding:8px
 .fc-history-row:hover{border-color:var(--primary)!important;background:rgba(37,99,235,.04)}
 
 /* HOME */
-.home-inner{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:16px 20px;text-align:center}
-.home-hero{width:100%;max-width:540px}
-.home-hero h1{font-family:'DM Serif Display',serif;font-size:clamp(1.5rem,5vw,2.5rem);line-height:1.15;margin-bottom:8px;letter-spacing:-.5px}
+.home-inner{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:20px 24px;text-align:center;gap:0}
+.home-hero{width:100%;max-width:480px}
+.home-greeting{font-size:.78rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;margin-bottom:6px}
+.home-hero h1{font-family:'DM Serif Display',serif;font-size:clamp(1.45rem,4.5vw,2.1rem);line-height:1.18;margin-bottom:6px;letter-spacing:-.4px}
 .home-hero h1 em{font-style:italic;color:var(--primary)}
-.home-hero p{color:var(--muted);font-size:.89rem;max-width:400px;margin:0 auto 12px;line-height:1.6;font-weight:600}
-#subjectBadge{margin:0 auto 16px;padding:.35rem 1.1rem;background:var(--primary);color:#fff;border-radius:999px;font-size:.8rem;font-weight:800;max-width:fit-content;letter-spacing:.01em}
+.home-hero p{color:var(--muted);font-size:.83rem;max-width:340px;margin:0 auto 16px;line-height:1.55;font-weight:600}
+#subjectBadge{margin:0 auto 14px;padding:.3rem .9rem;background:var(--primary);color:#fff;border-radius:999px;font-size:.76rem;font-weight:800;max-width:fit-content;letter-spacing:.01em}
 .info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
 .info-card{background:var(--surface2);border:2px solid var(--border);border-radius:16px;padding:13px 10px;text-align:center;transition:transform .18s;position:relative;overflow:hidden}
 .info-card:hover{transform:translateY(-2px)}
@@ -147,7 +152,12 @@ header{display:flex;align-items:center;justify-content:space-between;padding:8px
 .flame-emoji{display:inline-block;animation:flicker 1.2s ease-in-out infinite;font-size:1.1rem}
 .info-card-loading .ic-score,.info-card-loading .ic-name{background:var(--border);border-radius:6px;color:transparent;animation:pulse 1.2s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
-.home-actions{display:flex;gap:9px;justify-content:center;flex-wrap:wrap}
+.home-actions{display:flex;flex-direction:column;gap:10px;align-items:center;width:100%}
+.home-actions .btn-primary{width:100%;max-width:320px;padding:14px 24px;font-size:1rem}
+.home-nav-row{display:flex;gap:8px;justify-content:center;width:100%;max-width:320px}
+.home-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 8px;background:var(--surface2);border:1.5px solid var(--border);border-radius:14px;cursor:pointer;font-family:'Nunito',sans-serif;font-size:.72rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;transition:all .18s}
+.home-nav-btn:hover{border-color:var(--primary);color:var(--primary);background:rgba(37,99,235,.05)}
+.home-nav-icon{font-size:1.2rem;line-height:1}
 
 /* QUIZ */
 #screen-quiz.active{display:flex;flex-direction:column}
@@ -325,7 +335,7 @@ body{height:100%;height:100dvh}
   .streak-badge{padding:2px 7px;font-size:.67rem}
   .screen-body{padding:10px 12px 10px}
   .lb-fixed{padding:8px 12px 0}
-  .home-inner{padding:10px 12px}
+  .home-inner{padding:12px 14px}
   .home-hero h1{font-size:1.4rem}
   .home-hero p{font-size:.82rem;margin-bottom:10px}
   .info-grid{gap:5px;margin-bottom:12px}
@@ -335,7 +345,7 @@ body{height:100%;height:100dvh}
   .info-card .ic-score{font-size:1.1rem}
   .info-card .ic-name{font-size:.62rem}
   .info-card .ic-sub{font-size:.55rem}
-  .home-actions .btn{flex:1;min-width:0;padding:8px 6px;font-size:.78rem}
+  .home-nav-btn{font-size:.68rem;padding:8px 6px}
   .profile-card{padding:9px 10px;margin-bottom:6px;gap:9px}
   .profile-avatar{width:40px;height:40px;font-size:1.4rem}
   .profile-display-name{font-size:.92rem}
@@ -364,7 +374,8 @@ body{height:100%;height:100dvh}
   .lb-controls .btn-xs{padding:4px 6px;font-size:.68rem}
   .modal{padding:16px 13px 20px;border-radius:15px}
   .screen.active{border-radius:14px}
-  .welcome-catchphrase h1{font-size:1.5rem}
+  .welcome-catchphrase h1{font-size:1.45rem}
+  .welcome-sub{font-size:.78rem}
   .welcome-badges{gap:5px}
   .welcome-badge{font-size:.7rem;padding:4px 10px}
   .results-back-bar{padding:8px 10px 0}
@@ -387,7 +398,7 @@ body{height:100%;height:100dvh}
   .info-card .ic-num{font-size:1.55rem}
   .info-card .ic-score{font-size:1.25rem}
   .info-card .ic-name{font-size:.67rem}
-  .home-actions .btn{flex:1;min-width:0;padding:9px 8px;font-size:.83rem}
+  .home-nav-btn{font-size:.7rem;padding:9px 7px}
   .profile-card{padding:10px 12px;margin-bottom:8px;gap:10px}
   .profile-avatar{width:46px;height:46px;font-size:1.6rem}
   .profile-display-name{font-size:1rem}
@@ -532,27 +543,30 @@ body{height:100%;height:100dvh}
 
   <!-- WELCOME -->
   <div id="screen-welcome" class="screen">
+    <div class="welcome-mark">🎓</div>
     <div class="welcome-catchphrase">
-      <h1>10 Questions.<br/><em>Every Day.</em><br/>Get Smarter.</h1>
+      <h1><em>Daily</em> Academic<br/>Challenge</h1>
     </div>
+    <p class="welcome-sub">10 questions. Every day.<br/>Track your streak, climb the board.</p>
     <div class="welcome-badges">
-      <span class="welcome-badge">📚 10 Daily Questions</span>
-      <span class="welcome-badge">🏆 Global Rankings</span>
-      <span class="welcome-badge">🔥 Daily Streaks</span>
+      <span class="welcome-badge">📚 Multi-subject</span>
+      <span class="welcome-badge">🏆 Rankings</span>
+      <span class="welcome-badge">🔥 Streaks</span>
     </div>
     <div class="welcome-actions">
-      <button class="btn btn-primary" onclick="onWelcomeGetStarted()">Get Started</button>
+      <button class="btn btn-primary" onclick="onWelcomeGetStarted()">Create Account</button>
     </div>
-    <div class="welcome-divider" style="margin-top:13px">or</div>
-    <button class="welcome-already" onclick="onWelcomeLogin()">I already have an account</button>
+    <div class="welcome-divider">or</div>
+    <button class="welcome-already" onclick="onWelcomeLogin()">Sign in to existing account</button>
   </div>
 
   <!-- HOME -->
   <div id="screen-home" class="screen">
     <div class="home-inner">
       <div class="home-hero">
-        <h1>10 Questions.<br/><em>Every Day.</em> Get Smarter.</h1>
-        <p>Sharpen your academic edge with daily challenges across Computer Science, Math, Logic, and more.</p>
+        <p class="home-greeting" id="homeGreeting">Ready to learn?</p>
+        <h1><em>Today's</em> Challenge</h1>
+        <p>10 questions across Science, Math, Logic &amp; more.</p>
         <div id="subjectBadge" style="display:none"></div>
         <div class="info-grid">
           <div class="info-card info-card-loading" id="homeCardYesterday">
@@ -572,9 +586,17 @@ body{height:100%;height:100dvh}
           </div>
         </div>
         <div class="home-actions">
-          <button class="btn btn-primary" onclick="startQuiz()">▶ Start Today's Set</button>
-          <button class="btn btn-ghost" onclick="showScreen('leaderboard')">📊 Leaderboard</button>
-          <button class="btn btn-ghost" id="profileHomeBtn" style="display:none" onclick="showScreen('profile')">👤 Profile</button>
+          <button class="btn btn-primary" onclick="startQuiz()">Start Today's Set</button>
+          <div class="home-nav-row">
+            <button class="home-nav-btn" onclick="showScreen('leaderboard')">
+              <span class="home-nav-icon">🏆</span>
+              <span>Rankings</span>
+            </button>
+            <button class="home-nav-btn" id="profileHomeBtn" style="display:none" onclick="showScreen('profile')">
+              <span class="home-nav-icon">👤</span>
+              <span>Profile</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -845,6 +867,14 @@ function showScreen(id) {
 }
 
 async function loadHomeStatCards() {
+  // Update greeting based on time
+  const greetEl = document.getElementById('homeGreeting');
+  if (greetEl) {
+    const hr = new Date().getHours();
+    const name = session?.user?.display_name || session?.user?.username;
+    const timeGreet = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
+    greetEl.textContent = name ? timeGreet + ', ' + name + '!' : timeGreet + '!';
+  }
   function setCard(cardId, score, name) {
     const card = document.getElementById(cardId);
     if (!card) return;
@@ -1151,7 +1181,7 @@ async function loadProfile() {
       '</div>' +
       '<div class="section-title" style="margin-bottom:8px">Recent Games</div>' +
       historyHTML +
-      '<div style="margin-top:10px;text-align:center"><button class="btn btn-danger btn-sm" onclick="doLogout()">Sign Out</button></div>';
+      ''  // sign-out removed (available in header);
   } catch(e) { el.innerHTML = '<p style="color:var(--danger)">' + e.message + '</p>'; }
 }
 
