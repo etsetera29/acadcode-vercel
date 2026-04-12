@@ -67,35 +67,34 @@ export default async function handler(req, res) {
     }
   } else if (period === 'month') {
     // Monthly: rank by number of daily #1 finishes this month
-    // Ties on a given day ALL count as #1 (same top score = all get +1)
+    // #1 = highest score that day; ties broken by fastest time_taken_seconds (only ONE true #1 per day)
     if (yl_filter) {
       rows = await sql`
-        WITH daily_best AS (
-          SELECT
-            (sc.submitted_at AT TIME ZONE 'Asia/Manila')::date AS day,
-            MAX(sc.score) AS top_score
-          FROM scores sc
-          JOIN users u ON u.id = sc.user_id
-          WHERE sc.submitted_at >= DATE_TRUNC('month', NOW() AT TIME ZONE 'Asia/Manila') AT TIME ZONE 'Asia/Manila'
-            AND u.year_level = ${yl_filter}
-          GROUP BY day
-        ),
-        user_daily AS (
+        WITH user_daily AS (
+          -- Best score + fastest time per user per day
           SELECT
             sc.user_id,
             (sc.submitted_at AT TIME ZONE 'Asia/Manila')::date AS day,
-            MAX(sc.score) AS day_score
+            MAX(sc.score)              AS day_score,
+            MIN(sc.time_taken_seconds) AS day_time
           FROM scores sc
           JOIN users u ON u.id = sc.user_id
           WHERE sc.submitted_at >= DATE_TRUNC('month', NOW() AT TIME ZONE 'Asia/Manila') AT TIME ZONE 'Asia/Manila'
             AND u.year_level = ${yl_filter}
           GROUP BY sc.user_id, day
         ),
+        daily_winner AS (
+          -- The single true #1 per day: top score, then fastest time, then earliest submission as final tiebreak
+          SELECT DISTINCT ON (day)
+            day,
+            user_id
+          FROM user_daily
+          ORDER BY day, day_score DESC, day_time ASC
+        ),
         top1_counts AS (
-          SELECT ud.user_id, COUNT(*) AS top1_count
-          FROM user_daily ud
-          JOIN daily_best db ON ud.day = db.day AND ud.day_score = db.top_score
-          GROUP BY ud.user_id
+          SELECT user_id, COUNT(*) AS top1_count
+          FROM daily_winner
+          GROUP BY user_id
         )
         SELECT
           u.id,
@@ -118,26 +117,28 @@ export default async function handler(req, res) {
       `;
     } else {
       rows = await sql`
-        WITH daily_best AS (
-          SELECT
-            (sc.submitted_at AT TIME ZONE 'Asia/Manila')::date AS day,
-            MAX(sc.score) AS top_score
-          FROM scores sc
-          GROUP BY day
-        ),
-        user_daily AS (
+        WITH user_daily AS (
+          -- Best score + fastest time per user per day
           SELECT
             sc.user_id,
             (sc.submitted_at AT TIME ZONE 'Asia/Manila')::date AS day,
-            MAX(sc.score) AS day_score
+            MAX(sc.score)              AS day_score,
+            MIN(sc.time_taken_seconds) AS day_time
           FROM scores sc
           GROUP BY sc.user_id, day
         ),
+        daily_winner AS (
+          -- The single true #1 per day: top score, then fastest time
+          SELECT DISTINCT ON (day)
+            day,
+            user_id
+          FROM user_daily
+          ORDER BY day, day_score DESC, day_time ASC
+        ),
         top1_counts AS (
-          SELECT ud.user_id, COUNT(*) AS top1_count
-          FROM user_daily ud
-          JOIN daily_best db ON ud.day = db.day AND ud.day_score = db.top_score
-          GROUP BY ud.user_id
+          SELECT user_id, COUNT(*) AS top1_count
+          FROM daily_winner
+          GROUP BY user_id
         )
         SELECT
           u.id,
@@ -160,32 +161,31 @@ export default async function handler(req, res) {
     }
   } else {
     // All time: rank by number of daily #1 finishes ever
+    // #1 = highest score that day; ties broken by fastest time_taken_seconds (only ONE true #1 per day)
     if (yl_filter) {
       rows = await sql`
-        WITH daily_best AS (
-          SELECT
-            (sc.submitted_at AT TIME ZONE 'Asia/Manila')::date AS day,
-            MAX(sc.score) AS top_score
-          FROM scores sc
-          JOIN users u ON u.id = sc.user_id
-          WHERE u.year_level = ${yl_filter}
-          GROUP BY day
-        ),
-        user_daily AS (
+        WITH user_daily AS (
           SELECT
             sc.user_id,
             (sc.submitted_at AT TIME ZONE 'Asia/Manila')::date AS day,
-            MAX(sc.score) AS day_score
+            MAX(sc.score)              AS day_score,
+            MIN(sc.time_taken_seconds) AS day_time
           FROM scores sc
           JOIN users u ON u.id = sc.user_id
           WHERE u.year_level = ${yl_filter}
           GROUP BY sc.user_id, day
         ),
+        daily_winner AS (
+          SELECT DISTINCT ON (day)
+            day,
+            user_id
+          FROM user_daily
+          ORDER BY day, day_score DESC, day_time ASC
+        ),
         top1_counts AS (
-          SELECT ud.user_id, COUNT(*) AS top1_count
-          FROM user_daily ud
-          JOIN daily_best db ON ud.day = db.day AND ud.day_score = db.top_score
-          GROUP BY ud.user_id
+          SELECT user_id, COUNT(*) AS top1_count
+          FROM daily_winner
+          GROUP BY user_id
         )
         SELECT
           u.id,
@@ -207,26 +207,26 @@ export default async function handler(req, res) {
       `;
     } else {
       rows = await sql`
-        WITH daily_best AS (
-          SELECT
-            (sc.submitted_at AT TIME ZONE 'Asia/Manila')::date AS day,
-            MAX(sc.score) AS top_score
-          FROM scores sc
-          GROUP BY day
-        ),
-        user_daily AS (
+        WITH user_daily AS (
           SELECT
             sc.user_id,
             (sc.submitted_at AT TIME ZONE 'Asia/Manila')::date AS day,
-            MAX(sc.score) AS day_score
+            MAX(sc.score)              AS day_score,
+            MIN(sc.time_taken_seconds) AS day_time
           FROM scores sc
           GROUP BY sc.user_id, day
         ),
+        daily_winner AS (
+          SELECT DISTINCT ON (day)
+            day,
+            user_id
+          FROM user_daily
+          ORDER BY day, day_score DESC, day_time ASC
+        ),
         top1_counts AS (
-          SELECT ud.user_id, COUNT(*) AS top1_count
-          FROM user_daily ud
-          JOIN daily_best db ON ud.day = db.day AND ud.day_score = db.top_score
-          GROUP BY ud.user_id
+          SELECT user_id, COUNT(*) AS top1_count
+          FROM daily_winner
+          GROUP BY user_id
         )
         SELECT
           u.id,
