@@ -225,12 +225,12 @@
       <div class="modal-switch">No account? <button onclick="switchModal('register')">Create one</button></div>
     </div>
 
-    <!-- REGISTER FORM — two-card layout -->
+    <!-- REGISTER FORM — desktop: two-card side-by-side | mobile: two-page wizard -->
     <div id="modal-register" style="display:none">
       <div class="reg-two-col">
 
-        <!-- LEFT CARD: form fields -->
-        <div class="reg-card reg-card-left">
+        <!-- PAGE 1 / LEFT CARD: form fields -->
+        <div class="reg-card reg-card-left" id="reg-page-1">
           <h2>Join Smart Mouse 🐭</h2>
           <p>Create an account and compete globally.</p>
           <div class="field"><label>Username</label><input id="reg-user" type="text" placeholder="e.g. alex" maxlength="24"/></div>
@@ -252,13 +252,17 @@
           </div>
           <div class="reg-card-bottom">
             <div class="form-error" id="reg-err"></div>
-            <button class="btn btn-primary" style="width:100%" id="reg-btn" onclick="doRegister()">Create Account</button>
-            <div class="modal-switch">Already have an account? <button onclick="switchModal('login')">Sign in</button></div>
+            <!-- Desktop: submit lives here -->
+            <button class="btn btn-primary reg-desktop-only" style="width:100%" id="reg-btn" onclick="doRegister(this)">Create Account</button>
+            <div class="modal-switch reg-desktop-only">Already have an account? <button onclick="switchModal('login')">Sign in</button></div>
+            <!-- Mobile: Next button to avatar page -->
+            <button class="btn btn-primary reg-mobile-only" style="width:100%" onclick="regGoPage2()">Next: Pick Avatar →</button>
+            <div class="modal-switch reg-mobile-only">Already have an account? <button onclick="switchModal('login')">Sign in</button></div>
           </div>
         </div>
 
-        <!-- RIGHT CARD: avatar picker -->
-        <div class="reg-card reg-card-right">
+        <!-- PAGE 2 / RIGHT CARD: avatar picker -->
+        <div class="reg-card reg-card-right" id="reg-page-2">
           <div class="icon-picker-wrap">
             <label>Pick Your Avatar <span style="color:var(--muted);font-weight:600;text-transform:none;letter-spacing:0">(shown on leaderboard &amp; profile)</span></label>
             <div class="icon-selected-preview" id="reg-icon-preview">
@@ -267,6 +271,12 @@
             </div>
             <input class="icon-search" type="text" placeholder="Search icons…" id="reg-icon-search" oninput="filterIcons()"/>
             <div class="icon-grid" id="reg-icon-grid"></div>
+          </div>
+          <!-- Mobile only: Back + Submit footer -->
+          <div class="reg-mobile-footer reg-mobile-only">
+            <button class="btn btn-ghost btn-sm" onclick="regGoPage1()">← Back</button>
+            <div class="form-error reg-err-p2" id="reg-err-p2"></div>
+            <button class="btn btn-primary" id="reg-btn-mobile" onclick="doRegister(this)">Create Account</button>
           </div>
         </div>
 
@@ -323,12 +333,41 @@ function switchModal(tab) {
   const modalEl = document.querySelector('#authModal .modal');
   if (modalEl) modalEl.classList.toggle('modal--wide', tab === 'register');
   if (tab === 'register') {
+    // Always reset to page 1 (wizard step 1) on open
+    const p1 = document.getElementById('reg-page-1'); if (p1) p1.classList.remove('reg-page-hidden');
+    const p2 = document.getElementById('reg-page-2'); if (p2) p2.classList.add('reg-page-hidden');
     selectedIcon = null; buildIconGrid();
-    const ylSel = document.getElementById('reg-year-level');
-    if (ylSel) ylSel.value = '';
-    const wrap = document.getElementById('reg-track-wrap');
-    if (wrap) wrap.style.display = 'none';
+    const ylSel = document.getElementById('reg-year-level'); if (ylSel) ylSel.value = '';
+    const wrap = document.getElementById('reg-track-wrap'); if (wrap) wrap.style.display = 'none';
+    const err = document.getElementById('reg-err'); if (err) err.textContent = '';
+    const err2 = document.getElementById('reg-err-p2'); if (err2) err2.textContent = '';
   }
+}
+
+/* ─── MOBILE WIZARD NAVIGATION ──────────────────────────────── */
+function regGoPage2() {
+  // Validate page-1 fields before advancing
+  const user       = document.getElementById('reg-user').value.trim();
+  const email      = document.getElementById('reg-email').value.trim();
+  const pass       = document.getElementById('reg-pass').value;
+  const year_level = document.getElementById('reg-year-level').value;
+  const tc         = document.getElementById('reg-track-course')?.value || '';
+  const errEl      = document.getElementById('reg-err');
+  errEl.textContent = '';
+  if (!user)                           { errEl.textContent = 'Please enter a username.'; return; }
+  if (user.length < 2 || user.length > 24) { errEl.textContent = 'Username must be 2–24 characters.'; return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { errEl.textContent = 'Invalid email address.'; return; }
+  if (pass.length < 6)                 { errEl.textContent = 'Password must be at least 6 characters.'; return; }
+  if (!year_level)                     { errEl.textContent = 'Please select your year level.'; return; }
+  if ((year_level === 'senior_high' || year_level === 'college') && !tc)
+                                       { errEl.textContent = 'Please select your track / course.'; return; }
+  document.getElementById('reg-page-1').classList.add('reg-page-hidden');
+  document.getElementById('reg-page-2').classList.remove('reg-page-hidden');
+}
+function regGoPage1() {
+  document.getElementById('reg-page-2').classList.add('reg-page-hidden');
+  document.getElementById('reg-page-1').classList.remove('reg-page-hidden');
+  const err2 = document.getElementById('reg-err-p2'); if (err2) err2.textContent = '';
 }
 
 /* ─── LOGIN ──────────────────────────────────────────────────── */
@@ -350,19 +389,21 @@ async function doLogin() {
 }
 
 /* ─── REGISTER ───────────────────────────────────────────────── */
-async function doRegister() {
+async function doRegister(callerBtn) {
   const user         = document.getElementById('reg-user').value.trim();
   const email        = document.getElementById('reg-email').value.trim();
   const pass         = document.getElementById('reg-pass').value;
   const year_level   = document.getElementById('reg-year-level').value;
   const track_course = document.getElementById('reg-track-course')?.value || '';
-  const errEl        = document.getElementById('reg-err');
-  const btn          = document.getElementById('reg-btn');
+  // Route error display to whichever page is active
+  const onPage2  = document.getElementById('reg-page-2') && !document.getElementById('reg-page-2').classList.contains('reg-page-hidden');
+  const errEl    = document.getElementById(onPage2 ? 'reg-err-p2' : 'reg-err');
+  const btn      = callerBtn || document.getElementById('reg-btn');
   errEl.textContent = '';
   if (!user || !email || !pass) { errEl.textContent = 'Please fill in all fields.'; return; }
   if (!year_level) { errEl.textContent = 'Please select your year level.'; return; }
   if ((year_level === 'senior_high' || year_level === 'college') && !track_course) { errEl.textContent = 'Please select your track / course.'; return; }
-  if (!selectedIcon) { errEl.textContent = 'Please select an avatar icon for your profile.'; return; }
+  if (!selectedIcon) { errEl.textContent = 'Please select an avatar icon.'; return; }
   btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Creating…';
   try {
     // Icon emoji sent as "flag" for full API/DB compatibility — no backend changes needed
@@ -900,7 +941,7 @@ function fcRender() {
     if (!session) { showScreen('welcome'); } else { showScreen('home'); checkDailyStatus(); }
   }, 1600);
   document.getElementById('li-pass').addEventListener('keydown', e=>{if(e.key==='Enter')doLogin()});
-  document.getElementById('reg-pass').addEventListener('keydown', e=>{if(e.key==='Enter')doRegister()});
+  document.getElementById('reg-pass').addEventListener('keydown', e=>{if(e.key==='Enter')doRegister(document.getElementById('reg-btn'));});
 })();
 
 function onWelcomeGetStarted() { openModal('register'); }
