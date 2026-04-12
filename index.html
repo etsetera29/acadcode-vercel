@@ -225,42 +225,52 @@
       <div class="modal-switch">No account? <button onclick="switchModal('register')">Create one</button></div>
     </div>
 
-    <!-- REGISTER FORM -->
+    <!-- REGISTER FORM — two-card layout -->
     <div id="modal-register" style="display:none">
-      <h2>Join Smart Mouse 🐭</h2>
-      <p>Create an account and compete globally.</p>
-      <div class="field"><label>Username</label><input id="reg-user" type="text" placeholder="e.g. alex" maxlength="24"/></div>
-      <div class="field"><label>Email</label><input id="reg-email" type="email" placeholder="alex@email.com"/></div>
-      <div class="field"><label>Password</label><input id="reg-pass" type="password" placeholder="min 6 characters"/></div>
-      <div class="field">
-        <label>Year Level</label>
-        <select id="reg-year-level" onchange="onYearLevelChange()">
-          <option value="">— Select Year Level —</option>
-          <option value="elementary">Elementary</option>
-          <option value="junior_high">Junior High School</option>
-          <option value="senior_high">Senior High School</option>
-          <option value="college">College</option>
-        </select>
-      </div>
-      <div class="field" id="reg-track-wrap" style="display:none">
-        <label id="reg-track-label">Track / Course</label>
-        <select id="reg-track-course"><option value="">— Select —</option></select>
-      </div>
+      <div class="reg-two-col">
 
-      <!-- ICON PICKER (replaces flag picker; stored in flag DB column for API compatibility) -->
-      <div class="icon-picker-wrap">
-        <label>Your Avatar Icon <span style="color:var(--muted);font-weight:600;text-transform:none;letter-spacing:0">(shown on leaderboard &amp; profile)</span></label>
-        <div class="icon-selected-preview" id="reg-icon-preview">
-          <span class="fp-em" id="reg-icon-em">🐭</span>
-          <span id="reg-icon-name" style="color:var(--text)">Select an icon below</span>
+        <!-- LEFT CARD: form fields -->
+        <div class="reg-card reg-card-left">
+          <h2>Join Smart Mouse 🐭</h2>
+          <p>Create an account and compete globally.</p>
+          <div class="field"><label>Username</label><input id="reg-user" type="text" placeholder="e.g. alex" maxlength="24"/></div>
+          <div class="field"><label>Email</label><input id="reg-email" type="email" placeholder="alex@email.com"/></div>
+          <div class="field"><label>Password</label><input id="reg-pass" type="password" placeholder="min 6 characters"/></div>
+          <div class="field">
+            <label>Year Level</label>
+            <select id="reg-year-level" onchange="onYearLevelChange()">
+              <option value="">— Select Year Level —</option>
+              <option value="elementary">Elementary</option>
+              <option value="junior_high">Junior High School</option>
+              <option value="senior_high">Senior High School</option>
+              <option value="college">College</option>
+            </select>
+          </div>
+          <div class="field" id="reg-track-wrap" style="display:none">
+            <label id="reg-track-label">Track / Course</label>
+            <select id="reg-track-course"><option value="">— Select —</option></select>
+          </div>
+          <div class="reg-card-bottom">
+            <div class="form-error" id="reg-err"></div>
+            <button class="btn btn-primary" style="width:100%" id="reg-btn" onclick="doRegister()">Create Account</button>
+            <div class="modal-switch">Already have an account? <button onclick="switchModal('login')">Sign in</button></div>
+          </div>
         </div>
-        <input class="icon-search" type="text" placeholder="Search icons…" id="reg-icon-search" oninput="filterIcons()"/>
-        <div class="icon-grid" id="reg-icon-grid"></div>
-      </div>
 
-      <div class="form-error" id="reg-err"></div>
-      <button class="btn btn-primary" style="width:100%" id="reg-btn" onclick="doRegister()">Create Account</button>
-      <div class="modal-switch">Already have an account? <button onclick="switchModal('login')">Sign in</button></div>
+        <!-- RIGHT CARD: avatar picker -->
+        <div class="reg-card reg-card-right">
+          <div class="icon-picker-wrap">
+            <label>Pick Your Avatar <span style="color:var(--muted);font-weight:600;text-transform:none;letter-spacing:0">(shown on leaderboard &amp; profile)</span></label>
+            <div class="icon-selected-preview" id="reg-icon-preview">
+              <span class="fp-em" id="reg-icon-em">🐭</span>
+              <span id="reg-icon-name" style="color:var(--text)">Select an icon below</span>
+            </div>
+            <input class="icon-search" type="text" placeholder="Search icons…" id="reg-icon-search" oninput="filterIcons()"/>
+            <div class="icon-grid" id="reg-icon-grid"></div>
+          </div>
+        </div>
+
+      </div>
     </div>
   </div>
 </div>
@@ -310,6 +320,8 @@ function handleOverlayClick(e) { if (e.target === document.getElementById('authM
 function switchModal(tab) {
   document.getElementById('modal-login').style.display    = tab === 'login'    ? '' : 'none';
   document.getElementById('modal-register').style.display = tab === 'register' ? '' : 'none';
+  const modalEl = document.querySelector('#authModal .modal');
+  if (modalEl) modalEl.classList.toggle('modal--wide', tab === 'register');
   if (tab === 'register') {
     selectedIcon = null; buildIconGrid();
     const ylSel = document.getElementById('reg-year-level');
