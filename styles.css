@@ -1307,27 +1307,28 @@ header {
 .modal::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 .modal-handle { display: none; }
 
-/* ── REGISTER TWO-COLUMN MODAL ── */
+/* ══ REGISTER — DESKTOP: TWO-COLUMN | MOBILE: TWO-PAGE WIZARD ══ */
+
+/* Desktop two-col */
 .modal--wide {
-  max-width: 820px;
+  max-width: min(820px, calc(100vw - 32px));
   padding: 0;
   overflow: hidden;
 }
 .reg-two-col {
   display: flex;
   align-items: stretch;
-  min-height: 520px;
+  height: min(88vh, 580px);
 }
 .reg-card {
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  padding: 28px 24px 24px;
+  padding: 26px 22px 22px;
+  overflow: hidden;
 }
-.reg-card-left {
-  background: var(--surface);
-}
+.reg-card-left { background: var(--surface); }
 .reg-card-left h2 { padding-right: 36px; }
 .reg-card-right {
   background: var(--surface2);
@@ -1335,35 +1336,98 @@ header {
   border-radius: 0 var(--radius-xl) var(--radius-xl) 0;
   overflow: hidden;
 }
+
+/* Right card icon picker fills remaining space */
 .reg-card-right .icon-picker-wrap {
   display: flex;
   flex-direction: column;
   flex: 1;
   overflow: hidden;
   margin-bottom: 0;
-  height: 100%;
 }
 .reg-card-right .icon-grid {
   flex: 1;
   overflow-y: auto;
-  max-height: none;
+  max-height: none !important;
+  /* auto-fill = adapts to any card width, never overflows */
+  grid-template-columns: repeat(auto-fill, minmax(62px, 1fr)) !important;
   background: var(--surface3);
   border-color: var(--border-bright);
 }
-.reg-card-bottom {
-  margin-top: auto;
-  padding-top: 10px;
-}
-@media (max-width: 640px) {
-  .modal--wide { max-width: 100%; overflow-y: auto; }
-  .reg-two-col { flex-direction: column; min-height: unset; }
+
+/* Left card bottom section always stays at the bottom */
+.reg-card-bottom { margin-top: auto; padding-top: 8px; }
+
+/* Elements that belong only to desktop or only to mobile */
+.reg-mobile-only  { display: none; }
+.reg-desktop-only { display: block; }
+
+/* Mobile footer inside right card — hidden on desktop */
+.reg-mobile-footer { display: none; }
+
+/* ── MOBILE: two-page wizard (≤ 767px) ── */
+@media (max-width: 767px) {
+  .modal--wide {
+    max-width: calc(100vw - 24px);
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  .reg-two-col {
+    flex-direction: column;
+    height: auto;
+    min-height: unset;
+  }
+  .reg-card {
+    width: 100%;
+    padding: 22px 18px 18px;
+    overflow: visible;
+  }
+  /* Page-switching: only one card visible at a time on mobile */
+  .reg-page-hidden { display: none !important; }
+
+  /* Swap desktop-only / mobile-only visibility */
+  .reg-desktop-only { display: none !important; }
+  .reg-mobile-only  { display: block; width: 100%; }
+
+  /* Right card: sits below left on mobile, stacked */
   .reg-card-right {
     border-left: none;
     border-top: 2px solid var(--border);
     border-radius: 0 0 var(--radius-xl) var(--radius-xl);
-    max-height: 280px;
+    overflow: visible;
   }
-  .reg-card-left h2 { padding-right: 30px; }
+
+  /* Icon grid: fixed scroll area on mobile */
+  .reg-card-right .icon-picker-wrap {
+    overflow: visible;
+    flex: unset;
+  }
+  .reg-card-right .icon-grid {
+    flex: unset;
+    max-height: 260px !important;
+    grid-template-columns: repeat(auto-fill, minmax(58px, 1fr)) !important;
+    overflow-y: auto;
+  }
+
+  /* Mobile submit footer (back + create account) */
+  .reg-mobile-footer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1.5px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .reg-mobile-footer .btn-primary { flex: 1; min-width: 0; }
+  .reg-err-p2 { width: 100%; font-size: 0.78rem; color: var(--danger); font-weight: 700; }
+}
+
+/* ── Landscape phone: tighten spacing ── */
+@media (max-width: 767px) and (max-height: 480px) and (orientation: landscape) {
+  .reg-card { padding: 12px 16px 12px; }
+  .reg-card-right .icon-grid { max-height: 170px !important; }
+  .field { margin-bottom: 7px; }
 }
 .modal-close {
   position: absolute;
@@ -1542,7 +1606,7 @@ body { height: 100%; height: 100dvh; }
   .lb-games, .lb-yl { display: none; }
   .lb-avatar { font-size: 1rem; }
   .lb-controls .btn-xs { padding: 4px 6px; font-size: 0.68rem; }
-  .modal { padding: 16px 13px 20px; border-radius: var(--radius-lg); }
+  .modal:not(.modal--wide) { padding: 16px 13px 20px; border-radius: var(--radius-lg); }
   .screen.active { border-radius: var(--radius-lg); }
   .welcome-catchphrase h1 { font-size: 1.45rem; }
   .welcome-sub { font-size: 0.78rem; }
@@ -1594,7 +1658,7 @@ body { height: 100%; height: 100dvh; }
   .ins-bubble { width: 72px !important; height: 72px !important; }
   .ins-bubble-score { font-size: 0.90rem !important; }
   .ins-bubble-name  { font-size: 0.54rem !important; }
-  .modal { padding: 18px 15px 22px; border-radius: var(--radius-lg); }
+  .modal:not(.modal--wide) { padding: 18px 15px 22px; border-radius: var(--radius-lg); }
   .screen.active { border-radius: var(--radius-lg); }
 }
 
@@ -1617,6 +1681,8 @@ body { height: 100%; height: 100dvh; }
   .results-stats { grid-template-columns: repeat(4, 1fr); gap: 11px; }
   .stats-row { grid-template-columns: repeat(4, 1fr); }
   .icon-grid { grid-template-columns: repeat(8, 1fr); }
+  /* Keep reg modal icon grid adaptive — never inherit fixed 8-col here */
+  .reg-card-right .icon-grid { grid-template-columns: repeat(auto-fill, minmax(62px, 1fr)) !important; }
   .home-inner { padding: 26px 32px; }
 }
 
