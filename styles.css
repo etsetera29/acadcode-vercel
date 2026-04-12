@@ -1300,8 +1300,40 @@ header {
   animation: fadeUp 0.3s ease;
   box-shadow: 0 20px 60px rgba(26, 31, 54, 0.20), 0 4px 0 var(--border-bright);
   max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+#modal-login {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+}
+/* Register form: flex column so footer never gets clipped */
+#modal-register {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(90vh - 52px); /* 52px = modal padding top+bottom */
+}
+#modal-register h2,
+#modal-register > p {
+  flex-shrink: 0;
+}
+.reg-fields {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding-right: 2px;
+  margin-right: -2px;
+}
+.reg-fields::-webkit-scrollbar { width: 4px; }
+.reg-fields::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.reg-footer {
+  flex-shrink: 0;
+  padding-top: 10px;
+  border-top: 1.5px solid var(--border);
+  margin-top: 8px;
 }
 .modal::-webkit-scrollbar { width: 4px; }
 .modal::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
