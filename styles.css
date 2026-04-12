@@ -1781,7 +1781,64 @@ body { height: 100%; height: 100dvh; }
   .quiz-bottom { padding-bottom: max(14px, env(safe-area-inset-bottom)); }
 }
 
-/* ══ AVATAR PICKER — new modal-based approach ══ */
+/* ══ SKELETON LOADERS ══════════════════════════════════════════ */
+@keyframes skelShimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
+
+.skel {
+  display: inline-block;
+  border-radius: 8px;
+  background: linear-gradient(90deg, var(--surface3) 25%, var(--border) 50%, var(--surface3) 75%);
+  background-size: 800px 100%;
+  animation: skelShimmer 1.4s ease-in-out infinite;
+}
+
+/* Home stat card skeletons */
+.skel-score  { width: 54px; height: 22px; border-radius: 6px; }
+.skel-name   { width: 72px; height: 11px; border-radius: 5px; margin-top: 3px; }
+
+/* Leaderboard skeleton */
+.lb-skeleton { padding: 6px 4px; }
+.lb-skel-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 13px;
+  border-bottom: 1.5px solid var(--border);
+}
+.lb-skel-row:last-child { border-bottom: none; }
+.skel-rank      { width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0; }
+.skel-name-long { flex: 1; height: 14px; border-radius: 6px; max-width: 160px; }
+.skel-badge     { width: 90px; height: 20px; border-radius: 20px; }
+.skel-score-sm  { width: 40px; height: 14px; border-radius: 6px; }
+
+/* Profile skeleton */
+.profile-skel { padding: 4px 0; }
+.profile-skel-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--surface2);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+  margin-bottom: 10px;
+}
+.profile-skel-info { display: flex; flex-direction: column; gap: 7px; flex: 1; }
+.skel-avatar { width: 56px; height: 56px; border-radius: 50%; flex-shrink: 0; }
+.profile-skel-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.skel-stat { height: 52px; border-radius: var(--radius-sm); }
+.skel-row  { display: block; width: 100%; height: 44px; border-radius: var(--radius-sm); margin-bottom: 7px; }
+
+/* ══ END SKELETON LOADERS ════════════════════════════════════== */
+
 
 /* Avatar row in the register form */
 .reg-avatar-row {
