@@ -27,6 +27,7 @@ export default async function handler(req, res) {
       rows = await sql`
         SELECT u.id,
                COALESCE(u.display_name, u.username) AS display_name,
+               u.flag,
                u.year_level, u.track_course,
                MAX(sc.score)              AS best_score,
                COUNT(sc.id)               AS games_played,
@@ -39,7 +40,7 @@ export default async function handler(req, res) {
         WHERE  (sc.submitted_at AT TIME ZONE 'Asia/Manila')::date
                = (NOW() AT TIME ZONE 'Asia/Manila')::date
           AND  u.year_level = ${yl_filter}
-        GROUP  BY u.id, u.username, u.display_name, u.streak, u.year_level, u.track_course
+        GROUP  BY u.id, u.username, u.display_name, u.flag, u.streak, u.year_level, u.track_course
         ORDER  BY best_score DESC, time_taken_seconds ASC, last_played ASC
         LIMIT  ${limit}
       `;
@@ -47,6 +48,7 @@ export default async function handler(req, res) {
       rows = await sql`
         SELECT u.id,
                COALESCE(u.display_name, u.username) AS display_name,
+               u.flag,
                u.year_level, u.track_course,
                MAX(sc.score)              AS best_score,
                COUNT(sc.id)               AS games_played,
@@ -58,7 +60,7 @@ export default async function handler(req, res) {
         JOIN   users  u ON u.id = sc.user_id
         WHERE  (sc.submitted_at AT TIME ZONE 'Asia/Manila')::date
                = (NOW() AT TIME ZONE 'Asia/Manila')::date
-        GROUP  BY u.id, u.username, u.display_name, u.streak, u.year_level, u.track_course
+        GROUP  BY u.id, u.username, u.display_name, u.flag, u.streak, u.year_level, u.track_course
         ORDER  BY best_score DESC, time_taken_seconds ASC, last_played ASC
         LIMIT  ${limit}
       `;
@@ -98,6 +100,7 @@ export default async function handler(req, res) {
         SELECT
           u.id,
           COALESCE(u.display_name, u.username) AS display_name,
+          u.flag,
           u.year_level, u.track_course,
           MAX(sc.score)          AS best_score,
           COUNT(sc.id)           AS games_played,
@@ -109,7 +112,7 @@ export default async function handler(req, res) {
         LEFT JOIN top1_counts t ON t.user_id = u.id
         WHERE sc.submitted_at >= DATE_TRUNC('month', NOW() AT TIME ZONE 'Asia/Manila') AT TIME ZONE 'Asia/Manila'
           AND u.year_level = ${yl_filter}
-        GROUP BY u.id, u.username, u.display_name, u.streak, u.year_level, u.track_course, t.top1_count
+        GROUP BY u.id, u.username, u.display_name, u.flag, u.streak, u.year_level, u.track_course, t.top1_count
         ORDER BY top1_count DESC, best_score DESC, u.streak DESC
         LIMIT ${limit}
       `;
@@ -139,6 +142,7 @@ export default async function handler(req, res) {
         SELECT
           u.id,
           COALESCE(u.display_name, u.username) AS display_name,
+          u.flag,
           u.year_level, u.track_course,
           MAX(sc.score)          AS best_score,
           COUNT(sc.id)           AS games_played,
@@ -149,7 +153,7 @@ export default async function handler(req, res) {
         JOIN users u ON u.id = sc.user_id
         LEFT JOIN top1_counts t ON t.user_id = u.id
         WHERE sc.submitted_at >= DATE_TRUNC('month', NOW() AT TIME ZONE 'Asia/Manila') AT TIME ZONE 'Asia/Manila'
-        GROUP BY u.id, u.username, u.display_name, u.streak, u.year_level, u.track_course, t.top1_count
+        GROUP BY u.id, u.username, u.display_name, u.flag, u.streak, u.year_level, u.track_course, t.top1_count
         ORDER BY top1_count DESC, best_score DESC, u.streak DESC
         LIMIT ${limit}
       `;
@@ -186,6 +190,7 @@ export default async function handler(req, res) {
         SELECT
           u.id,
           COALESCE(u.display_name, u.username) AS display_name,
+          u.flag,
           u.year_level, u.track_course,
           MAX(sc.score)          AS best_score,
           COUNT(sc.id)           AS games_played,
@@ -196,7 +201,7 @@ export default async function handler(req, res) {
         JOIN users u ON u.id = sc.user_id
         LEFT JOIN top1_counts t ON t.user_id = u.id
         WHERE u.year_level = ${yl_filter}
-        GROUP BY u.id, u.username, u.display_name, u.streak, u.year_level, u.track_course, t.top1_count
+        GROUP BY u.id, u.username, u.display_name, u.flag, u.streak, u.year_level, u.track_course, t.top1_count
         ORDER BY top1_count DESC, best_score DESC, u.streak DESC
         LIMIT ${limit}
       `;
@@ -226,6 +231,7 @@ export default async function handler(req, res) {
         SELECT
           u.id,
           COALESCE(u.display_name, u.username) AS display_name,
+          u.flag,
           u.year_level, u.track_course,
           MAX(sc.score)          AS best_score,
           COUNT(sc.id)           AS games_played,
@@ -235,7 +241,7 @@ export default async function handler(req, res) {
         FROM scores sc
         JOIN users u ON u.id = sc.user_id
         LEFT JOIN top1_counts t ON t.user_id = u.id
-        GROUP BY u.id, u.username, u.display_name, u.streak, u.year_level, u.track_course, t.top1_count
+        GROUP BY u.id, u.username, u.display_name, u.flag, u.streak, u.year_level, u.track_course, t.top1_count
         ORDER BY top1_count DESC, best_score DESC, u.streak DESC
         LIMIT ${limit}
       `;
@@ -246,6 +252,7 @@ export default async function handler(req, res) {
     rank:               i + 1,
     id:                 Number(row.id),
     display_name:       row.display_name,
+    flag:               row.flag ?? '🐭',
     year_level:         row.year_level ?? 'college',
     track_course:       row.track_course ?? null,
     best_score:         Number(row.best_score),
