@@ -191,26 +191,6 @@
   </div>
 </div><!-- /.app -->
 
-<!-- AVATAR PICKER MODAL -->
-<div class="modal-overlay" id="avatarModal" onclick="handleAvatarOverlayClick(event)">
-  <div class="modal avatar-modal">
-    <button class="modal-close" onclick="closeAvatarModal()">✕</button>
-    <div class="avatar-modal-head">
-      <h2>Pick Your Avatar</h2>
-      <p>Shown on leaderboard &amp; profile</p>
-    </div>
-    <div class="icon-selected-preview" id="reg-icon-preview">
-      <span class="fp-em" id="avatar-modal-em">🐭</span>
-      <span id="avatar-modal-name" style="color:var(--text)">Select an icon below</span>
-    </div>
-    <input class="icon-search" type="text" placeholder="Search icons…" id="reg-icon-search" oninput="filterIcons()"/>
-    <div class="icon-grid" id="reg-icon-grid"></div>
-    <div class="avatar-modal-footer">
-      <button class="btn btn-primary" style="flex:1" onclick="confirmAvatar()">Confirm Avatar</button>
-    </div>
-  </div>
-</div>
-
 <!-- FLASHCARD OVERLAY -->
 <div id="flashcard-overlay" style="display:none">
   <div class="fc-backdrop" onclick="closeFlashcards()"></div>
@@ -245,41 +225,62 @@
       <div class="modal-switch">No account? <button onclick="switchModal('register')">Create one</button></div>
     </div>
 
-    <!-- REGISTER FORM — single column with avatar modal -->
+    <!-- REGISTER FORM — desktop: two-card side-by-side | mobile: two-page wizard -->
     <div id="modal-register" style="display:none">
-      <h2>Join Smart Mouse 🐭</h2>
-      <p>Create an account and compete globally.</p>
-      <div class="field"><label>Username</label><input id="reg-user" type="text" placeholder="e.g. alex" maxlength="24"/></div>
-      <div class="field"><label>Email</label><input id="reg-email" type="email" placeholder="alex@email.com"/></div>
-      <div class="field"><label>Password</label><input id="reg-pass" type="password" placeholder="min 6 characters"/></div>
-      <div class="field">
-        <label>Year Level</label>
-        <select id="reg-year-level" onchange="onYearLevelChange()">
-          <option value="">— Select Year Level —</option>
-          <option value="elementary">Elementary</option>
-          <option value="junior_high">Junior High School</option>
-          <option value="senior_high">Senior High School</option>
-          <option value="college">College</option>
-        </select>
-      </div>
-      <div class="field" id="reg-track-wrap" style="display:none">
-        <label id="reg-track-label">Track / Course</label>
-        <select id="reg-track-course"><option value="">— Select —</option></select>
-      </div>
-      <!-- Avatar picker row -->
-      <div class="field">
-        <label>Avatar <span style="color:var(--muted);font-weight:500;text-transform:none;letter-spacing:0;font-size:.8rem">(shown on leaderboard &amp; profile)</span></label>
-        <div class="reg-avatar-row">
-          <div class="reg-avatar-preview" id="reg-avatar-preview">
-            <span id="reg-icon-em">🐭</span>
-            <span id="reg-icon-name" style="color:var(--muted)">No avatar chosen</span>
+      <div class="reg-two-col">
+
+        <!-- PAGE 1 / LEFT CARD: form fields -->
+        <div class="reg-card reg-card-left" id="reg-page-1">
+          <h2>Join Smart Mouse 🐭</h2>
+          <p>Create an account and compete globally.</p>
+          <div class="field"><label>Username</label><input id="reg-user" type="text" placeholder="e.g. alex" maxlength="24"/></div>
+          <div class="field"><label>Email</label><input id="reg-email" type="email" placeholder="alex@email.com"/></div>
+          <div class="field"><label>Password</label><input id="reg-pass" type="password" placeholder="min 6 characters"/></div>
+          <div class="field">
+            <label>Year Level</label>
+            <select id="reg-year-level" onchange="onYearLevelChange()">
+              <option value="">— Select Year Level —</option>
+              <option value="elementary">Elementary</option>
+              <option value="junior_high">Junior High School</option>
+              <option value="senior_high">Senior High School</option>
+              <option value="college">College</option>
+            </select>
           </div>
-          <button type="button" class="btn btn-ghost btn-sm reg-avatar-btn" onclick="openAvatarModal()">Choose Avatar</button>
+          <div class="field" id="reg-track-wrap" style="display:none">
+            <label id="reg-track-label">Track / Course</label>
+            <select id="reg-track-course"><option value="">— Select —</option></select>
+          </div>
+          <div class="reg-card-bottom">
+            <div class="form-error" id="reg-err"></div>
+            <!-- Desktop: submit lives here -->
+            <button class="btn btn-primary reg-desktop-only" style="width:100%" id="reg-btn" onclick="doRegister(this)">Create Account</button>
+            <div class="modal-switch reg-desktop-only">Already have an account? <button onclick="switchModal('login')">Sign in</button></div>
+            <!-- Mobile: Next button to avatar page -->
+            <button class="btn btn-primary reg-mobile-only" style="width:100%" onclick="regGoPage2()">Next: Pick Avatar →</button>
+            <div class="modal-switch reg-mobile-only">Already have an account? <button onclick="switchModal('login')">Sign in</button></div>
+          </div>
         </div>
+
+        <!-- PAGE 2 / RIGHT CARD: avatar picker -->
+        <div class="reg-card reg-card-right" id="reg-page-2">
+          <div class="icon-picker-wrap">
+            <label>Pick Your Avatar <span style="color:var(--muted);font-weight:600;text-transform:none;letter-spacing:0">(shown on leaderboard &amp; profile)</span></label>
+            <div class="icon-selected-preview" id="reg-icon-preview">
+              <span class="fp-em" id="reg-icon-em">🐭</span>
+              <span id="reg-icon-name" style="color:var(--text)">Select an icon below</span>
+            </div>
+            <input class="icon-search" type="text" placeholder="Search icons…" id="reg-icon-search" oninput="filterIcons()"/>
+            <div class="icon-grid" id="reg-icon-grid"></div>
+          </div>
+          <!-- Mobile only: Back + Submit footer -->
+          <div class="reg-mobile-footer reg-mobile-only">
+            <button class="btn btn-ghost btn-sm" onclick="regGoPage1()">← Back</button>
+            <div class="form-error reg-err-p2" id="reg-err-p2"></div>
+            <button class="btn btn-primary" id="reg-btn-mobile" onclick="doRegister(this)">Create Account</button>
+          </div>
+        </div>
+
       </div>
-      <div class="form-error" id="reg-err"></div>
-      <button class="btn btn-primary" style="width:100%;margin-top:4px" id="reg-btn" onclick="doRegister(this)">Create Account</button>
-      <div class="modal-switch">Already have an account? <button onclick="switchModal('login')">Sign in</button></div>
     </div>
   </div>
 </div>
@@ -330,47 +331,43 @@ function switchModal(tab) {
   document.getElementById('modal-login').style.display    = tab === 'login'    ? '' : 'none';
   document.getElementById('modal-register').style.display = tab === 'register' ? '' : 'none';
   const modalEl = document.querySelector('#authModal .modal');
-  if (modalEl) modalEl.classList.remove('modal--wide');
+  if (modalEl) modalEl.classList.toggle('modal--wide', tab === 'register');
   if (tab === 'register') {
-    selectedIcon = null;
-    // Reset avatar preview
-    document.getElementById('reg-icon-em').textContent   = '🐭';
-    document.getElementById('reg-icon-name').textContent = 'No avatar chosen';
-    document.getElementById('reg-icon-name').style.color = 'var(--muted)';
+    // Always reset to page 1 (wizard step 1) on open
+    const p1 = document.getElementById('reg-page-1'); if (p1) p1.classList.remove('reg-page-hidden');
+    const p2 = document.getElementById('reg-page-2'); if (p2) p2.classList.add('reg-page-hidden');
+    selectedIcon = null; buildIconGrid();
     const ylSel = document.getElementById('reg-year-level'); if (ylSel) ylSel.value = '';
     const wrap = document.getElementById('reg-track-wrap'); if (wrap) wrap.style.display = 'none';
     const err = document.getElementById('reg-err'); if (err) err.textContent = '';
+    const err2 = document.getElementById('reg-err-p2'); if (err2) err2.textContent = '';
   }
 }
 
-/* ─── AVATAR PICKER MODAL ────────────────────────────────────── */
-function openAvatarModal() {
-  // Sync avatar modal preview with current selection
-  const em   = document.getElementById('avatar-modal-em');
-  const name = document.getElementById('avatar-modal-name');
-  if (em)   em.textContent   = selectedIcon || '🐭';
-  if (name) name.textContent = selectedIcon
-    ? (ICON_LIST.find(([e]) => e === selectedIcon)?.[1] || selectedIcon)
-    : 'Select an icon below';
-  buildIconGrid(document.getElementById('reg-icon-search')?.value || '');
-  document.getElementById('avatarModal').classList.add('open');
+/* ─── MOBILE WIZARD NAVIGATION ──────────────────────────────── */
+function regGoPage2() {
+  // Validate page-1 fields before advancing
+  const user       = document.getElementById('reg-user').value.trim();
+  const email      = document.getElementById('reg-email').value.trim();
+  const pass       = document.getElementById('reg-pass').value;
+  const year_level = document.getElementById('reg-year-level').value;
+  const tc         = document.getElementById('reg-track-course')?.value || '';
+  const errEl      = document.getElementById('reg-err');
+  errEl.textContent = '';
+  if (!user)                           { errEl.textContent = 'Please enter a username.'; return; }
+  if (user.length < 2 || user.length > 24) { errEl.textContent = 'Username must be 2–24 characters.'; return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { errEl.textContent = 'Invalid email address.'; return; }
+  if (pass.length < 6)                 { errEl.textContent = 'Password must be at least 6 characters.'; return; }
+  if (!year_level)                     { errEl.textContent = 'Please select your year level.'; return; }
+  if ((year_level === 'senior_high' || year_level === 'college') && !tc)
+                                       { errEl.textContent = 'Please select your track / course.'; return; }
+  document.getElementById('reg-page-1').classList.add('reg-page-hidden');
+  document.getElementById('reg-page-2').classList.remove('reg-page-hidden');
 }
-function closeAvatarModal() {
-  document.getElementById('avatarModal').classList.remove('open');
-  // Reset search
-  const s = document.getElementById('reg-icon-search'); if (s) s.value = '';
-}
-function handleAvatarOverlayClick(e) {
-  if (e.target === document.getElementById('avatarModal')) closeAvatarModal();
-}
-function confirmAvatar() {
-  if (selectedIcon) {
-    const name = ICON_LIST.find(([e]) => e === selectedIcon)?.[1] || selectedIcon;
-    document.getElementById('reg-icon-em').textContent   = selectedIcon;
-    document.getElementById('reg-icon-name').textContent = name;
-    document.getElementById('reg-icon-name').style.color = 'var(--text)';
-  }
-  closeAvatarModal();
+function regGoPage1() {
+  document.getElementById('reg-page-2').classList.add('reg-page-hidden');
+  document.getElementById('reg-page-1').classList.remove('reg-page-hidden');
+  const err2 = document.getElementById('reg-err-p2'); if (err2) err2.textContent = '';
 }
 
 /* ─── LOGIN ──────────────────────────────────────────────────── */
@@ -398,13 +395,15 @@ async function doRegister(callerBtn) {
   const pass         = document.getElementById('reg-pass').value;
   const year_level   = document.getElementById('reg-year-level').value;
   const track_course = document.getElementById('reg-track-course')?.value || '';
-  const errEl    = document.getElementById('reg-err');
+  // Route error display to whichever page is active
+  const onPage2  = document.getElementById('reg-page-2') && !document.getElementById('reg-page-2').classList.contains('reg-page-hidden');
+  const errEl    = document.getElementById(onPage2 ? 'reg-err-p2' : 'reg-err');
   const btn      = callerBtn || document.getElementById('reg-btn');
   errEl.textContent = '';
   if (!user || !email || !pass) { errEl.textContent = 'Please fill in all fields.'; return; }
   if (!year_level) { errEl.textContent = 'Please select your year level.'; return; }
   if ((year_level === 'senior_high' || year_level === 'college') && !track_course) { errEl.textContent = 'Please select your track / course.'; return; }
-  if (!selectedIcon) { errEl.textContent = 'Please choose an avatar icon.'; return; }
+  if (!selectedIcon) { errEl.textContent = 'Please select an avatar icon.'; return; }
   btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Creating…';
   try {
     // Icon emoji sent as "flag" for full API/DB compatibility — no backend changes needed
@@ -877,11 +876,8 @@ function buildIconGrid(filter='') {
 
 function selectIcon(em, name) {
   selectedIcon = em;
-  // Update avatar modal preview
-  const mEm   = document.getElementById('avatar-modal-em');
-  const mName = document.getElementById('avatar-modal-name');
-  if (mEm)   mEm.textContent   = em;
-  if (mName) { mName.textContent = name; mName.style.color = 'var(--text)'; }
+  document.getElementById('reg-icon-em').textContent = em;
+  document.getElementById('reg-icon-name').textContent = name;
   buildIconGrid(document.getElementById('reg-icon-search')?.value || '');
 }
 
