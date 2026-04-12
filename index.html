@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Smart Mouse — Daily Academic Challenge</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="styles.css"/>
 </head>
 <body>
@@ -62,19 +62,19 @@
         <p>10 questions across Science, Math, Logic &amp; more.</p>
         <div id="subjectBadge" style="display:none"></div>
         <div class="info-grid">
-          <div class="info-card info-card-loading" id="homeCardYesterday">
-            <span class="ic-score">—</span>
-            <span class="ic-name">Loading…</span>
+          <div class="info-card" id="homeCardYesterday">
+            <span class="ic-score"><span class="skel skel-score"></span></span>
+            <span class="ic-name"><span class="skel skel-name"></span></span>
             <span class="ic-sub">🏅 Top Today</span>
           </div>
-          <div class="info-card info-card-loading" id="homeCardMonthly">
-            <span class="ic-score">—</span>
-            <span class="ic-name">Loading…</span>
+          <div class="info-card" id="homeCardMonthly">
+            <span class="ic-score"><span class="skel skel-score"></span></span>
+            <span class="ic-name"><span class="skel skel-name"></span></span>
             <span class="ic-sub">👑 Top Monthly</span>
           </div>
-          <div class="info-card flame-card info-card-loading" id="homeCardAllTime">
-            <span class="ic-score"><span class="flame-emoji">🔥</span></span>
-            <span class="ic-name">Loading…</span>
+          <div class="info-card flame-card" id="homeCardAllTime">
+            <span class="ic-score"><span class="skel skel-score"></span></span>
+            <span class="ic-name"><span class="skel skel-name"></span></span>
             <span class="ic-sub">All-Time #1</span>
           </div>
         </div>
@@ -161,7 +161,7 @@
         </div>
         <div class="lb-yl-filter">
           <label>Filter by:</label>
-          <select id="lb-yl-select" onchange="loadLeaderboard(currentLbPeriod)">
+          <select id="lb-yl-select" onchange="onLbFilterChange()">
             <option value="">All Year Levels</option>
             <option value="elementary">Elementary</option>
             <option value="junior_high">Junior High</option>
@@ -169,7 +169,7 @@
             <option value="college">College</option>
           </select>
         </div>
-        <div id="lb-main"></div>
+        <div id="lb-main"><div class="lb-skeleton"></div></div>
       </div>
       <div id="lb-tab-insights" style="display:none">
         <div id="lb-insights-content"></div>
@@ -449,7 +449,6 @@ async function loadHomeStatCards() {
   function setCard(cardId, score, name) {
     const card = document.getElementById(cardId);
     if (!card) return;
-    card.classList.remove('info-card-loading');
     const scoreEl = card.querySelector('.ic-score');
     const nameEl  = card.querySelector('.ic-name');
     if (scoreEl) {
@@ -625,6 +624,22 @@ async function showResults() {
 
 /* ─── LEADERBOARD ────────────────────────────────────────────── */
 let currentLbPeriod = 'all';
+const _lbCache = {};
+let _lbDebounce = null;
+
+function lbSkeletonHTML() {
+  let rows = '';
+  for (let i = 0; i < 5; i++) {
+    rows += '<div class="lb-skel-row">' +
+      '<span class="skel skel-rank"></span>' +
+      '<span class="skel skel-name-long"></span>' +
+      '<span class="skel skel-badge"></span>' +
+      '<span class="skel skel-score-sm"></span>' +
+    '</div>';
+  }
+  return '<div class="lb-skeleton">' + rows + '</div>';
+}
+
 async function loadLeaderboard(period = 'all', containerId = 'lb-main') {
   currentLbPeriod = period;
   ['all','month','today'].forEach(p => {
@@ -638,14 +653,29 @@ async function loadLeaderboard(period = 'all', containerId = 'lb-main') {
   const yl = document.getElementById('lb-yl-select')?.value ?? '';
   const container = document.getElementById(containerId);
   if (!container) return;
-  container.innerHTML = '<div class="lb-table"><div class="lb-empty"><span class="spinner"></span> Loading…</div></div>';
+
+  const cacheKey = period + ':' + yl;
+  if (_lbCache[cacheKey]) {
+    renderLbTable(_lbCache[cacheKey], container, period);
+    return;
+  }
+
+  container.innerHTML = lbSkeletonHTML();
   try {
     const qs = 'period=' + period + '&limit=20' + (yl ? '&year_level=' + encodeURIComponent(yl) : '');
     const data = await api('GET', 'leaderboard?' + qs, null, false);
+    _lbCache[cacheKey] = data.leaderboard;
+    // expire cache after 60s
+    setTimeout(() => { delete _lbCache[cacheKey]; }, 60000);
     renderLbTable(data.leaderboard, container, period);
   } catch(e) {
     container.innerHTML = '<div class="lb-table"><div class="lb-empty">⚠ Could not load leaderboard.<br><small>' + e.message + '</small></div></div>';
   }
+}
+
+function onLbFilterChange() {
+  clearTimeout(_lbDebounce);
+  _lbDebounce = setTimeout(() => loadLeaderboard(currentLbPeriod), 200);
 }
 
 function ylLabel(year_level, track_course) {
@@ -735,7 +765,11 @@ function switchInsTab(idx) {
 async function loadProfile() {
   const el = document.getElementById('profile-content');
   if (!session) { el.innerHTML = '<p style="color:var(--muted)">Please sign in to view your profile.</p>'; return; }
-  el.innerHTML = '<div style="text-align:center;padding:40px"><span class="spinner"></span></div>';
+  el.innerHTML = '<div class="profile-skel">' +
+    '<div class="profile-skel-card"><span class="skel skel-avatar"></span><div class="profile-skel-info"><span class="skel skel-name-long"></span><span class="skel skel-name"></span><span class="skel skel-badge"></span></div></div>' +
+    '<div class="profile-skel-stats"><span class="skel skel-stat"></span><span class="skel skel-stat"></span><span class="skel skel-stat"></span><span class="skel skel-stat"></span></div>' +
+    '<span class="skel skel-row"></span><span class="skel skel-row"></span><span class="skel skel-row"></span>' +
+    '</div>';
   try {
     const data = await api('GET', 'me'); const u = data.user;
     const historyHTML = u.history.length
