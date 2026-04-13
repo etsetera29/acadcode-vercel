@@ -12,7 +12,7 @@
 
 <div class="app">
   <header>
-    <div class="logo">
+    <div class="logo" id="headerLogo" onclick="onLogoClick()" title="">
       <div class="logo-icon">🧠</div>
       Smart <span>Mouse</span>
     </div>
@@ -230,62 +230,112 @@
 
 <!-- AUTH MODAL -->
 <div class="modal-overlay" id="authModal" onclick="handleOverlayClick(event)">
-  <div class="modal">
-    <span class="modal-handle"></span>
-    <button class="modal-close" onclick="closeModal()">✕</button>
 
-    <!-- LOGIN FORM -->
-    <div id="modal-login">
-      <h2>Welcome back 👋</h2>
-      <p>Sign in to save your scores globally.</p>
-      <div class="field"><label>Username or Email</label><input id="li-user" type="text" placeholder="e.g. alex or alex@email.com"/></div>
-      <div class="field"><label>Password</label><input id="li-pass" type="password" placeholder="••••••••"/></div>
-      <div class="form-error" id="li-err"></div>
-      <button class="btn btn-primary" style="width:100%;margin-top:4px" id="li-btn" onclick="doLogin()">Sign In</button>
-      <div class="modal-switch">No account? <button onclick="switchModal('register')">Create one</button></div>
+  <!-- ══ LOGIN PANEL ══ -->
+  <div class="auth-panel auth-panel--login" id="modal-login">
+    <button class="auth-close" onclick="closeModal()">✕</button>
+
+    <!-- Left: branding -->
+    <div class="auth-brand">
+      <div class="auth-brand-logo">
+        <div class="auth-brand-icon">🧠</div>
+        <span class="auth-brand-name">Smart<span>Mouse</span></span>
+      </div>
+      <div class="auth-brand-tagline">Test what you know.<br/>Learn what you don't.</div>
+      <div class="auth-brand-sub">10 questions every day. Track your streak, climb the board.</div>
+      <div class="auth-brand-features">
+        <div class="auth-feat"><div class="auth-feat-dot"></div><span>Multi-subject daily challenges</span></div>
+        <div class="auth-feat"><div class="auth-feat-dot"></div><span>Global leaderboards</span></div>
+        <div class="auth-feat"><div class="auth-feat-dot"></div><span>Streaks &amp; rankings</span></div>
+      </div>
     </div>
 
-    <!-- REGISTER FORM — single column with avatar modal -->
-    <div id="modal-register" style="display:none">
-      <h2>Join Smart Mouse 🐭</h2>
-      <p>Create an account and compete globally.</p>
-      <div class="reg-fields">
-        <div class="field"><label>Username</label><input id="reg-user" type="text" placeholder="e.g. alex" maxlength="24"/></div>
-        <div class="field"><label>Email</label><input id="reg-email" type="email" placeholder="alex@email.com"/></div>
-        <div class="field"><label>Password</label><input id="reg-pass" type="password" placeholder="min 6 characters"/></div>
-        <div class="field">
-          <label>Year Level</label>
-          <select id="reg-year-level" onchange="onYearLevelChange()">
-            <option value="">— Select Year Level —</option>
-            <option value="elementary">Elementary</option>
-            <option value="junior_high">Junior High School</option>
-            <option value="senior_high">Senior High School</option>
-            <option value="college">College</option>
-          </select>
+    <!-- Right: form -->
+    <div class="auth-form-panel">
+      <div class="auth-form-inner">
+        <div class="auth-form-header">
+          <div class="auth-form-title">Welcome back</div>
+          <div class="auth-form-sub">Sign in to save your scores globally.</div>
         </div>
-        <div class="field" id="reg-track-wrap" style="display:none">
-          <label id="reg-track-label">Track / Course</label>
-          <select id="reg-track-course"><option value="">— Select —</option></select>
-        </div>
-        <!-- Avatar picker row -->
-        <div class="field">
-          <label>Avatar <span style="color:var(--muted);font-weight:500;text-transform:none;letter-spacing:0;font-size:.8rem">(shown on leaderboard &amp; profile)</span></label>
-          <div class="reg-avatar-row">
-            <div class="reg-avatar-preview" id="reg-avatar-preview">
-              <span id="reg-icon-em">🐭</span>
-              <span id="reg-icon-name" style="color:var(--muted)">No avatar chosen</span>
-            </div>
-            <button type="button" class="btn btn-ghost btn-sm reg-avatar-btn" onclick="openAvatarModal()">Choose Avatar</button>
-          </div>
-        </div>
-      </div>
-      <div class="reg-footer">
-        <div class="form-error" id="reg-err"></div>
-        <button class="btn btn-primary" style="width:100%;margin-top:4px" id="reg-btn" onclick="doRegister(this)">Create Account</button>
-        <div class="modal-switch">Already have an account? <button onclick="switchModal('login')">Sign in</button></div>
+        <div class="field"><label>Username or Email</label><input id="li-user" type="text" placeholder="e.g. alex or alex@email.com"/></div>
+        <div class="field"><label>Password</label><input id="li-pass" type="password" placeholder="••••••••"/></div>
+        <div class="form-error" id="li-err"></div>
+        <button class="btn btn-primary auth-submit-btn" id="li-btn" onclick="doLogin()">Sign in</button>
+        <div class="auth-divider"><span>or</span></div>
+        <div class="auth-switch">No account? <button onclick="switchModal('register')">Create one</button></div>
       </div>
     </div>
   </div>
+
+  <!-- ══ REGISTER PANEL ══ -->
+  <div class="auth-panel auth-panel--register" id="modal-register" style="display:none">
+    <button class="auth-close" onclick="closeModal()">✕</button>
+
+    <!-- Left: form -->
+    <div class="auth-form-panel auth-form-panel--reg">
+      <div class="auth-form-inner auth-form-inner--reg">
+        <div class="auth-form-header">
+          <div class="auth-form-title">Create account</div>
+          <div class="auth-form-sub">Join Smart Mouse and compete globally.</div>
+        </div>
+        <div class="reg-fields">
+          <div class="auth-fields-grid">
+            <div class="field"><label>Username</label><input id="reg-user" type="text" placeholder="e.g. alex" maxlength="24"/></div>
+            <div class="field"><label>Email</label><input id="reg-email" type="email" placeholder="alex@email.com"/></div>
+          </div>
+          <div class="auth-fields-grid">
+            <div class="field"><label>Password</label><input id="reg-pass" type="password" placeholder="min 6 characters"/></div>
+            <div class="field">
+              <label>Year Level</label>
+              <select id="reg-year-level" onchange="onYearLevelChange()">
+                <option value="">— Select Year Level —</option>
+                <option value="elementary">Elementary</option>
+                <option value="junior_high">Junior High School</option>
+                <option value="senior_high">Senior High School</option>
+                <option value="college">College</option>
+              </select>
+            </div>
+          </div>
+          <div class="field" id="reg-track-wrap" style="display:none">
+            <label id="reg-track-label">Track / Course</label>
+            <select id="reg-track-course"><option value="">— Select —</option></select>
+          </div>
+          <!-- Avatar picker row -->
+          <div class="field">
+            <label>Avatar <span style="color:var(--muted);font-weight:500;text-transform:none;letter-spacing:0;font-size:.8rem">(shown on leaderboard &amp; profile)</span></label>
+            <div class="reg-avatar-row">
+              <div class="reg-avatar-preview" id="reg-avatar-preview">
+                <span id="reg-icon-em">🐭</span>
+                <span id="reg-icon-name" style="color:var(--muted)">No avatar chosen</span>
+              </div>
+              <button type="button" class="btn btn-ghost btn-sm reg-avatar-btn" onclick="openAvatarModal()">Choose Avatar</button>
+            </div>
+          </div>
+        </div>
+        <div class="reg-footer">
+          <div class="form-error" id="reg-err"></div>
+          <button class="btn btn-primary auth-submit-btn" id="reg-btn" onclick="doRegister(this)">Create Account</button>
+          <div class="auth-switch">Already have an account? <button onclick="switchModal('login')">Sign in</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: branding -->
+    <div class="auth-brand auth-brand--right">
+      <div class="auth-brand-logo">
+        <div class="auth-brand-icon">🧠</div>
+        <span class="auth-brand-name">Smart<span>Mouse</span></span>
+      </div>
+      <div class="auth-brand-tagline">Challenge yourself.<br/>Every single day.</div>
+      <div class="auth-brand-sub">Join thousands of learners sharpening their minds with daily quizzes.</div>
+      <div class="auth-brand-features">
+        <div class="auth-feat"><div class="auth-feat-dot"></div><span>Pick your avatar &amp; stand out</span></div>
+        <div class="auth-feat"><div class="auth-feat-dot"></div><span>Compete by year level</span></div>
+        <div class="auth-feat"><div class="auth-feat-dot"></div><span>Track accuracy over time</span></div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -313,15 +363,25 @@ async function api(method, path, body, auth = true) {
 }
 
 /* ─── AUTH AREA ──────────────────────────────────────────────── */
+function onLogoClick() {
+  // Only navigate home if user is logged in — prevents bypassing auth
+  if (!session) return;
+  showScreen('home');
+  checkDailyStatus();
+}
+
 function renderAuthArea() {
   const el = document.getElementById('authArea');
   const pb = document.getElementById('profileHomeBtn');
+  const logo = document.getElementById('headerLogo');
   if (session) {
     el.innerHTML = '<button class="btn btn-ghost btn-sm" onclick="doLogout()">Sign Out</button>';
     if (pb) pb.style.display = '';
+    if (logo) { logo.classList.add('logo--clickable'); logo.title = 'Go to home'; }
   } else {
     el.innerHTML = '<button class="btn btn-primary btn-sm" onclick="openModal(\'login\')">Sign In</button>';
     if (pb) pb.style.display = 'none';
+    if (logo) { logo.classList.remove('logo--clickable'); logo.title = ''; }
   }
   document.getElementById('streakNum').textContent = session?.user?.streak ?? 0;
 }
@@ -331,13 +391,10 @@ function openModal(tab) { switchModal(tab); document.getElementById('authModal')
 function closeModal()   { document.getElementById('authModal').classList.remove('open'); }
 function handleOverlayClick(e) { if (e.target === document.getElementById('authModal')) closeModal(); }
 function switchModal(tab) {
-  document.getElementById('modal-login').style.display    = tab === 'login'    ? '' : 'none';
+  document.getElementById('modal-login').style.display    = tab === 'login'    ? 'flex' : 'none';
   document.getElementById('modal-register').style.display = tab === 'register' ? 'flex' : 'none';
-  const modalEl = document.querySelector('#authModal .modal');
-  if (modalEl) modalEl.classList.remove('modal--wide');
   if (tab === 'register') {
     selectedIcon = null;
-    // Reset avatar preview
     document.getElementById('reg-icon-em').textContent   = '🐭';
     document.getElementById('reg-icon-name').textContent = 'No avatar chosen';
     document.getElementById('reg-icon-name').style.color = 'var(--muted)';
