@@ -59,9 +59,21 @@ ${listed}
 
   return `You are an academic quiz generator. Generate exactly 10 questions about "${subject}" for ${dateStr}.
 
-Question type mix:
-- 7 standard multiple-choice questions (4 distinct options A–D)
-- 3 True/False questions — these MUST still have exactly 4 options:
+Question type mix — generate EXACTLY in this order and breakdown:
+  MCQ 1:  elementary      (multiple-choice, 4 distinct options A-D)
+  MCQ 2:  elementary      (multiple-choice, 4 distinct options A-D)
+  MCQ 3:  middle-school   (multiple-choice, 4 distinct options A-D)
+  MCQ 4:  middle-school   (multiple-choice, 4 distinct options A-D)
+  MCQ 5:  high-school     (multiple-choice, 4 distinct options A-D)
+  MCQ 6:  high-school     (multiple-choice, 4 distinct options A-D)
+  MCQ 7:  college         (multiple-choice, 4 distinct options A-D)
+  T/F 8:  middle-school   (true/false)
+  T/F 9:  high-school     (true/false)
+  T/F 10: college         (true/false)
+
+This gives the required difficulty distribution: 2 elementary, 3 middle-school, 3 high-school, 2 college.
+
+True/False questions MUST still have exactly 4 options:
     Option A: "True"
     Option B: "False"
     Option C: "Sometimes / It depends"
@@ -69,7 +81,6 @@ Question type mix:
   The correct answer for T/F questions will almost always be A or B (a clear true or false). Only use C or D if the statement is genuinely ambiguous by academic standards.
 
 General requirements:
-- Mix difficulty across all 10: 2 elementary, 3 middle-school, 3 high-school, 2 college level
 - Each question must have exactly 4 options, only one correct
 - Include a clear, educational explanation for the correct answer
 - If a question involves code, include it in the "code" field (otherwise set to null)
