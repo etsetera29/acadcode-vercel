@@ -17,7 +17,46 @@ const SUBJECTS = {
   6: 'Arts & Culture',
 };
 
-function buildPrompt(subject, dateStr) {
+// How many days of history to check for repeated questions
+const REPEAT_LOOKBACK_DAYS = 30;
+
+/**
+ * Fetch recent question texts and categories for the same subject
+ * from the last REPEAT_LOOKBACK_DAYS days, to inject into the prompt
+ * so the AI can explicitly avoid repeating them.
+ */
+async function fetchRecentQuestions(subject) {
+  try {
+    const rows = await sql`
+      SELECT text, category
+      FROM   questions
+      WHERE  subject       = ${subject}
+        AND  question_date >= (CURRENT_DATE - ${REPEAT_LOOKBACK_DAYS}::int)
+      ORDER  BY question_date DESC
+    `;
+    return rows; // [{ text, category }, ...]
+  } catch (e) {
+    // Non-fatal — if this fails, generation still proceeds without the hint
+    console.warn('Could not fetch recent questions for dedup:', e.message);
+    return [];
+  }
+}
+
+function buildPrompt(subject, dateStr, recentQuestions) {
+  // Build a dedupe block only when there's history to share
+  let dedupeBlock = '';
+  if (recentQuestions.length > 0) {
+    const listed = recentQuestions
+      .map((q, i) => `${i + 1}. [${q.category}] ${q.text}`)
+      .join('\n');
+    dedupeBlock = `
+
+IMPORTANT — Do NOT repeat or closely paraphrase any of the following questions that have already been used in the last ${REPEAT_LOOKBACK_DAYS} days. Vary the specific concepts, facts, and categories so learners always encounter fresh material:
+<already_used>
+${listed}
+</already_used>`;
+  }
+
   return `You are an academic quiz generator. Generate exactly 10 multiple-choice questions about "${subject}" for ${dateStr}.
 
 Requirements:
@@ -27,6 +66,7 @@ Requirements:
 - If a question involves code, include it in the "code" field (otherwise set to null)
 - Keep questions factual, unambiguous, and curriculum-appropriate
 - Vary the category within the subject (e.g. for Science: Physics, Chemistry, Biology, etc.)
+- Ensure every question covers a DISTINCT concept — no two questions should test the same fact or idea${dedupeBlock}
 
 Respond with ONLY a valid JSON array — no markdown fences, no preamble, no extra text. Each element:
 {
@@ -70,6 +110,9 @@ export default async function handler(req, res) {
     return ok(res, { message: 'Questions already generated for today.', date: dateStr, subject });
   }
 
+  // Fetch recent questions for this subject to guide deduplication
+  const recentQuestions = await fetchRecentQuestions(subject);
+
   // Call Groq API (free, no credit card, OpenAI-compatible)
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) return err(res, 'GROQ_API_KEY not configured.', 500);
@@ -85,9 +128,9 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         model:       'llama-3.3-70b-versatile',
         max_tokens:  4096,
-        temperature: 0.7,
+        temperature: 0.85, // slightly higher temperature encourages more variety
         messages: [
-          { role: 'user', content: buildPrompt(subject, dateStr) }
+          { role: 'user', content: buildPrompt(subject, dateStr, recentQuestions) }
         ],
       }),
     });
@@ -113,10 +156,39 @@ export default async function handler(req, res) {
     return err(res, `Parse error: ${e.message}`, 502);
   }
 
-  // Save to DB
+  // Post-generation dedup guard: drop any generated question whose text
+  // is suspiciously similar (>80% word overlap) to a recent one, and log it.
+  const recentTexts = recentQuestions.map(q => q.text.toLowerCase());
+
+  function wordOverlap(a, b) {
+    const setA = new Set(a.split(/\s+/));
+    const setB = new Set(b.split(/\s+/));
+    const intersection = [...setA].filter(w => setB.has(w)).length;
+    return intersection / Math.max(setA.size, setB.size);
+  }
+
+  const dedupedQuestions = [];
+  const flagged = [];
+  for (const q of questions) {
+    const qLow = q.text.toLowerCase();
+    const tooSimilar = recentTexts.some(r => wordOverlap(qLow, r) > 0.8);
+    if (tooSimilar) {
+      flagged.push(q.text);
+      console.warn('Dedup: dropped near-duplicate question:', q.text);
+    } else {
+      dedupedQuestions.push(q);
+    }
+  }
+
+  // If we lost too many to dedup, log a warning but still save what we have
+  if (dedupedQuestions.length < 10) {
+    console.warn(`Dedup removed ${flagged.length} question(s); only ${dedupedQuestions.length} unique remain.`);
+  }
+
+  // Save to DB (up to 10; positions are 0-indexed)
   const saved = [];
-  for (let i = 0; i < 10; i++) {
-    const q = questions[i];
+  for (let i = 0; i < Math.min(10, dedupedQuestions.length); i++) {
+    const q = dedupedQuestions[i];
     await sql`
       INSERT INTO questions
         (question_date, subject, position, category, text, code, options, answer, explanation)
@@ -130,8 +202,10 @@ export default async function handler(req, res) {
   }
 
   return ok(res, {
-    message: `Generated and saved ${saved.length} questions.`,
-    date: dateStr,
+    message:  `Generated and saved ${saved.length} questions.`,
+    date:     dateStr,
     subject,
+    deduped:  flagged.length,
+    ...(flagged.length > 0 && { flaggedQuestions: flagged }),
   });
 }
