@@ -57,19 +57,30 @@ ${listed}
 </already_used>`;
   }
 
-  return `You are an academic quiz generator. Generate exactly 10 multiple-choice questions about "${subject}" for ${dateStr}.
+  return `You are an academic quiz generator. Generate exactly 10 questions about "${subject}" for ${dateStr}.
 
-Requirements:
-- Mix difficulty: 2 elementary, 3 middle-school, 3 high-school, 2 college level
-- Each question must have exactly 4 options (A–D), only one correct
+Question type mix:
+- 7 standard multiple-choice questions (4 distinct options A–D)
+- 3 True/False questions — these MUST still have exactly 4 options:
+    Option A: "True"
+    Option B: "False"
+    Option C: "Sometimes / It depends"
+    Option D: "Cannot be determined"
+  The correct answer for T/F questions will almost always be A or B (a clear true or false). Only use C or D if the statement is genuinely ambiguous by academic standards.
+
+General requirements:
+- Mix difficulty across all 10: 2 elementary, 3 middle-school, 3 high-school, 2 college level
+- Each question must have exactly 4 options, only one correct
 - Include a clear, educational explanation for the correct answer
 - If a question involves code, include it in the "code" field (otherwise set to null)
 - Keep questions factual, unambiguous, and curriculum-appropriate
 - Vary the category within the subject (e.g. for Science: Physics, Chemistry, Biology, etc.)
-- Ensure every question covers a DISTINCT concept — no two questions should test the same fact or idea${dedupeBlock}
+- Ensure every question covers a DISTINCT concept — no two questions should test the same fact or idea
+- For True/False questions, set "type": "truefalse"; for standard questions, set "type": "mcq"${dedupeBlock}
 
 Respond with ONLY a valid JSON array — no markdown fences, no preamble, no extra text. Each element:
 {
+  "type": "mcq",
   "category": "string",
   "text": "question text",
   "code": null,
